@@ -8,7 +8,7 @@ const authRoute = require('./routes/authRoute');
 
 // Configuring the env file
 const dotenv = require("dotenv");
-dotenv.config({ path: "config.env" });
+dotenv.config();
 
 // Creating our Express App
 const app = express();
@@ -27,4 +27,16 @@ dbConnect().then(() => {
     app.listen(PORT, () => {
         console.log(`Server up & running at http://localhost:${PORT}`);
     })
+});
+
+// Express Global Error Handler
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+    res.status(statusCode).json({
+        success: false,
+        statusCode,
+        message
+
+    });
 });
