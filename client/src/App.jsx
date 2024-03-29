@@ -12,6 +12,7 @@ import SignUp from "./pages/SignUp";
 
 // Importing our custom components
 import Header from "./components/Header/Header";
+import FooterSection from './components/Footer/Footer';
 
 // Creating our App
 const App = () => {
@@ -28,6 +29,7 @@ const App = () => {
         <Route path='/dashboard' element={<Dashboard/>} />
         <Route path='/projects' element={<Projects/>} />
       </Routes>
+      <FooterSection />                                {/* placed under BrowserRouter.. so, that is shown on all pages */}
     </BrowserRouter>  
   );
 };

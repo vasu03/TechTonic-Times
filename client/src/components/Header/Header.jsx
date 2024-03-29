@@ -10,12 +10,12 @@ const Header = () => {
   const path = useLocation().pathname;                      // to get the current pathName (current EndPoint) of the active/open page
 
   return (
-    <Navbar className="border-b-2" >
-      <Link to="/" className='self-center whitespace-nowrap text-sm sm:text-xl font-bold' >
-        <span className='text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-600'>
+    <Navbar className="border-b-2 shadow-md" >
+      <Link to="/" className='self-center whitespace-nowrap text-sm sm:text-3xl font-bold' >
+      <span className='text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-600'>
           TechTonic 
         </span>
-        <span className='dark:text-white'> Times</span>
+        <span className='text-transparent bg-clip-text bg-gradient-to-l from-gray-400 to-gray-600 dark:text-white'> Times</span>
       </Link>
 
       <form>
@@ -23,6 +23,7 @@ const Header = () => {
             type='text'
             placeholder='Search...'
             rightIcon={AiOutlineSearch}
+            sizing='sm'
             className='hidden lg:inline'
         />
       </form>
@@ -32,17 +33,16 @@ const Header = () => {
       </Button>
 
       <div className='flex gap-2 md:order-2 items-center justify-between'>
-        <Button className='w-12 h-10 hidden sm:inline self-center' color='gray' pill >
+        <Button className='hidden sm:inline self-center' color='gray' pill size='xs'>
           <FaMoon />
         </Button>
 
-        <Link to="/signIn" >
+        <Link to="/signUp" >
         <Button 
             gradientDuoTone='greenToBlue'
-            size='sm'
-            className='self-center rounded-lg flex items-center content-center'
+            size='xs'
         >
-          Sign In
+          Sign Up
           <FaKey className='ml-2 h-3 w-3'/>
         </Button>     
         </Link>
@@ -50,14 +50,14 @@ const Header = () => {
       </div>
 
         <Navbar.Collapse>
-          <Navbar.Link active={path === "/"} as={'div'}>
-            <Link to='/'>Home</Link>
+          <Navbar.Link as={'div'}>
+            <Link to='/' className={`text-sm ${path === "/" ? 'text-green-400' : 'text-gray-400'} md:hover:text-green-400 transition-colors duration-300`}>Home</Link>
           </Navbar.Link>
-          <Navbar.Link active={path === "/about"} as={'div'}>
-            <Link to='/about'>About</Link>
+          <Navbar.Link as={'div'}>
+            <Link to='/about' className={`text-sm ${path === "/about" ? 'text-green-400' : 'text-gray-400'} md:hover:text-green-400 transition-colors duration-300`}>About</Link>
           </Navbar.Link>
-          <Navbar.Link active={path === "/projects"} as={'div'}>
-            <Link to='/projects'>Projects</Link>
+          <Navbar.Link as={'div'}>
+            <Link to='/projects' className={`text-sm ${path === "/projects" ? 'text-green-400' : 'text-gray-400'} md:hover:text-green-400 transition-colors duration-300`}>Projects</Link>
           </Navbar.Link>
         </Navbar.Collapse>
     </Navbar>
