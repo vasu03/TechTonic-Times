@@ -1,5 +1,6 @@
 // Importing Required Modules
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require("../models/userModel");
 const { validateUserRegistration, validateUserLogin } = require("../middlewares/authUserValidattion");
 
@@ -43,7 +44,30 @@ exports.signUp = async (req, res, next) => {
 // Creating a signIn Controller Function
 exports.signIn = async (req, res, next) => {
     try {
-        
+        // Validating the user info before creating it
+        validateUserLogin(req.body);
+
+        // Destructure the info
+        const { email, password } = req.body;
+
+        // Checking if the email exists
+        const validUser = await User.findOne({ email: email });
+        if (!validUser) {
+            throw new Error("User do not Exist"); 
+        }
+
+        // Check password validity
+        const validPass = bcrypt.compareSync(password, validUser.password);
+        if (!validPass) {
+            throw new Error("Invalid Email or Password");
+        }
+
+        // Create a token
+        const token = jwt.sign( { id: validUser._id }, process.env.JWT_SECRET);
+        // Exclude the password from user
+        const { password: passwd, ...rest } = validUser._doc;
+        res.status(200).cookie('token', token, {httpOnly: true}).json(rest);
+
     } catch (error) {
         next(error);
     }

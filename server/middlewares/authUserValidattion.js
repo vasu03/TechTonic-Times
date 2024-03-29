@@ -26,6 +26,7 @@ const validateUserLogin = (data) => {
     }
 };
 
+// Exporting our modules
 module.exports = {
     validateUserRegistration,
     validateUserLogin

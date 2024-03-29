@@ -3,7 +3,7 @@ const express = require('express');
 const { dbConnect } = require('./database/dbConnection');
 
 // Importing the routes
-const userRoute = require('./routes/userRoute');
+// const userRoute = require('./routes/userRoute');
 const authRoute = require('./routes/authRoute');
 
 // Configuring the env file
@@ -17,7 +17,7 @@ const app = express();
 app.use(express.json());
 
 // Setting up the routes
-app.use('/api/user', userRoute);
+// app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
 
 // Starting the Express App server
