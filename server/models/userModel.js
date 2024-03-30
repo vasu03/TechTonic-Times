@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
         required: true,
         min: 8
     },
+    profilePicture: {
+        type: String,
+        default: "https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG-Clipart.png"
+    }
 }, { timestamps: true });
 
 // Exporting our model

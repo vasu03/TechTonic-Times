@@ -3,6 +3,9 @@ import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+// Importing our custom components
+import OAuth from '../components/OAuth/OAuth';
+
 // Creating our SignUp page
 const SignUp = () => {
 
@@ -122,14 +125,7 @@ const SignUp = () => {
                     ) : "Sign Up"
                 }
               </Button>
-              <Button 
-                className='w-full'
-                gradientDuoTone='greenToBlue'
-                outline
-                type='submit'
-              >
-                Continue with Google
-              </Button>
+              <OAuth />
             </div>
           </form>
           <div className='flex gap-3 text-xs mt-3'>

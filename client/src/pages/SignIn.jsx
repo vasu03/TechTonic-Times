@@ -7,6 +7,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { signInStart, signInSuccess,signInFailure } from "../redux/user/userSlice"; 
 
+// Importing our custom components
+import OAuth from '../components/OAuth/OAuth';
+
 // Creating our SignUp page
 const SignIn = () => {
 
@@ -14,7 +17,7 @@ const SignIn = () => {
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({});
-  const { loading, error: errorMessage } = useSelector(state => state.user);
+  const { loading, error: errorMessage } = useSelector((state) => state.user);
   const navigate = useNavigate();
   
   // Funcion to handle the changes in form
@@ -116,14 +119,7 @@ const SignIn = () => {
                     ) : "Sign In"
                 }
               </Button>
-              <Button 
-                className='w-full'
-                gradientDuoTone='greenToBlue'
-                outline
-                type='submit'
-              >
-                Sign In with Google
-              </Button>
+              <OAuth />
             </div>
           </form>
           <div className='flex gap-3 text-xs mt-3'>

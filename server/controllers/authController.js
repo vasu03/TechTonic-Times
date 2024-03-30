@@ -72,3 +72,43 @@ exports.signIn = async (req, res, next) => {
         next(error);
     }
 };
+
+// Creating a Google req handler Controller function
+exports.google = async (req, res, next) => {
+    // Destructure the info
+    const { name, email, googlePhotoUrl } = req.body;
+
+    try {
+        const userExist = await User.findOne({ email });
+        if(userExist){
+            const token = jwt.sign({id: userExist._id}, process.env.JWT_SECRET);
+            const { password: passwd, ...rest } = userExist._doc;
+            res.status(200).cookie('token', token, {httpOnly: true}).json(rest);
+        } else{
+            // Else if the user do not exist then create a new User
+            // Generate a random pass of length = 16 ...(8 + 8) as it is required in our model
+            const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            // Protecting the credentials
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(generatedPassword, salt);
+
+            // Now create the new user and save it
+            const newUser = new User({
+                // Convert the username in such a format that it is always unique
+                // Test User => testuser6519        ... here we lowercase, split at space, join them and add a random 4 digit value to it
+                userName: name.toLowerCase().split(' ').join('') + Math.random().toString(9).slice(-4),
+                email: email,
+                password: hashedPassword,
+                profilePicture: googlePhotoUrl
+            });
+
+            await newUser.save();
+
+            const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET);
+            const { password: passwd, ...rest } = newUser._doc;
+            res.status(200).cookie('token', token, {httpOnly: true}).json(rest);
+        }
+    } catch (error) {
+        next(error);
+    };
+}; 

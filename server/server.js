@@ -15,6 +15,7 @@ const app = express();
 
 // Setting up the middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));        // Middleware to parse URL-encoded bodies
 
 // Setting up the routes
 // app.use('/api/user', userRoute);
