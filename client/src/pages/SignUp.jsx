@@ -57,7 +57,7 @@ const SignUp = () => {
 
 
   return (
-    <div className='min-h-screen max-w-prose mx-auto mt-8 sm:mt-20 md:max-w-max'>
+    <div className='min-h-screen max-w-prose mx-auto mt-8 sm:mt-20 md:max-w-max '>
       <div className='flex flex-col gap-5 max-w-4xl mx-auto p-3 md:flex-row md:items-center'>
         {/* Left Side Container */}
         <div className='flex-1'>
@@ -66,7 +66,7 @@ const SignUp = () => {
             className='self-centered whitespace-nowrap font-bold dark:text-white text-4xl'
           >
             <span className='text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-600'>TechTonic</span>
-            <span className='text-transparent bg-clip-text bg-gradient-to-l from-gray-400 to-gray-600 dark:text-white'> Times</span>
+            <span className='text-transparent bg-clip-text bg-gradient-to-l from-gray-400 to-gray-600 dark:from-orange-300 dark:to-pink-500'> Times</span>
           </Link>
           <p className='mt-3 leading-5 md:pe-14 md:text-justify'>
             <span className='font-semibold'>Welcome to TechToinic Times!</span><br />

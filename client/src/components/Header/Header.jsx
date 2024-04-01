@@ -3,15 +3,20 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Navbar, TextInput, Button, Dropdown, Avatar } from "flowbite-react";
 import { AiOutlineSearch } from "react-icons/ai";
-import { FaMoon, FaKey } from "react-icons/fa";
+import { FaMoon, FaKey, FaSun } from "react-icons/fa";
 import { HiLogout, HiViewGrid } from "react-icons/hi";
-import { useSelector } from "react-redux";
+
+// Importing global states from Redux-Store
+import { useDispatch, useSelector } from "react-redux"; 
+import { toggleTheme } from '../../redux/theme/themeSlice';
 
 // Creating out Header
 const Header = () => {
   // Some variables
   const path = useLocation().pathname;                      // to get the current pathName (current EndPoint) of the active/open page
+  const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
+  const { theme } = useSelector((state) => state.theme);
 
   return (
     <Navbar className="border-b-2 shadow-md">
@@ -22,8 +27,7 @@ const Header = () => {
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-600">
           TechTonic
         </span>
-        <span className="text-transparent bg-clip-text bg-gradient-to-l from-gray-400 to-gray-600 dark:text-white">
-          {" "}
+        <span className="text-transparent bg-clip-text bg-gradient-to-l from-gray-400 to-gray-600 dark:from-orange-300 dark:to-pink-500">
           Times
         </span>
       </Link>
@@ -48,8 +52,9 @@ const Header = () => {
           color="gray"
           pill
           size="xs"
+          onClick={ () => dispatch(toggleTheme()) }
         >
-          <FaMoon />
+          { theme === "light" ? <FaMoon /> : <FaSun />}
         </Button>
 
         {/* Creating a User specific menu */}
@@ -88,7 +93,7 @@ const Header = () => {
           <Link
             to="/"
             className={`text-sm ${
-              path === "/" ? "text-green-400" : "text-gray-400"
+              path === "/" ? "text-green-400" : "dark:text-gray-100"
             } md:hover:text-green-400 transition-colors duration-300`}
           >
             Home
@@ -98,7 +103,7 @@ const Header = () => {
           <Link
             to="/about"
             className={`text-sm ${
-              path === "/about" ? "text-green-400" : "text-gray-400"
+              path === "/about" ? "text-green-400" : "dark:text-gray-100"
             } md:hover:text-green-400 transition-colors duration-300`}
           >
             About
@@ -108,7 +113,7 @@ const Header = () => {
           <Link
             to="/projects"
             className={`text-sm ${
-              path === "/projects" ? "text-green-400" : "text-gray-400"
+              path === "/projects" ? "text-green-400" : "dark:text-gray-100"
             } md:hover:text-green-400 transition-colors duration-300`}
           >
             Projects

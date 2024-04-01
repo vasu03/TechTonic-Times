@@ -20,10 +20,8 @@ const FooterSection = () => {
                 {/* Container for Logo */}
                 <div className="">
                     <Link to="/" className="self-center whitespace-nowrap text-lg sm:text-2xl font-bold" >
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-600">
-                        TechTonic 
-                        </span>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-l from-gray-400 to-gray-600 dark:text-white"> Times</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-600">TechTonic</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-l from-gray-400 to-gray-600 dark:from-orange-300 dark:to-pink-500"> Times</span>
                     </Link>
                 </div>
 

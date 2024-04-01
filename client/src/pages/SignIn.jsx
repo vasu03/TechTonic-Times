@@ -69,7 +69,7 @@ const SignIn = () => {
             className='self-centered whitespace-nowrap font-bold dark:text-white text-4xl'
           >
             <span className='text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-600'>TechTonic</span>
-            <span className='text-transparent bg-clip-text bg-gradient-to-l from-gray-400 to-gray-600 dark:text-white'> Times</span>
+            <span className='text-transparent bg-clip-text bg-gradient-to-l from-gray-400 to-gray-600 dark:from-orange-300 dark:to-pink-500'> Times</span>
           </Link>
           <p className='mt-3 leading-5 md:pe-14 md:text-justify'>
             <span className='font-semibold'>Welcome to TechToinic Times!</span><br />

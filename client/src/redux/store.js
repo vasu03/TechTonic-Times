@@ -6,10 +6,12 @@ import storage from "redux-persist/lib/storage";
 
 // Importing our Reducers from Custom-Slices
 import userReducer from "./user/userSlice";
+import themeReducer from "./theme/themeSlice";
 
 // Creating a root reducer by combining different reducers
 const rootReducer = combineReducers({
     user: userReducer,
+    theme: themeReducer,
 });
 
 // Creating a persisting reducer
