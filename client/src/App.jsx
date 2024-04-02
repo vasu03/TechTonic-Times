@@ -13,6 +13,7 @@ import SignUp from "./pages/SignUp";
 // Importing our custom components
 import Header from "./components/Header/Header";
 import FooterSection from './components/Footer/Footer';
+import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 
 // Creating our App
 const App = () => {
@@ -26,7 +27,9 @@ const App = () => {
         <Route path='/about' element={<About/>} />
         <Route path='/signIn' element={<SignIn/>} />
         <Route path='/signUp' element={<SignUp/>} />
-        <Route path='/dashboard' element={<Dashboard/>} />
+        <Route element={<PrivateRoute/>}>          {/* make the dashboard private  */}
+          <Route path='/dashboard' element={<Dashboard/>} />
+        </Route>
         <Route path='/projects' element={<Projects/>} />
       </Routes>
       <FooterSection />                                {/* placed under BrowserRouter.. so, that is shown on all pages */}
