@@ -1,9 +1,10 @@
 // Importing required modules
 const express = require('express');
+const cookieParser = require("cookie-parser");
 const { dbConnect } = require('./database/dbConnection');
 
 // Importing the routes
-// const userRoute = require('./routes/userRoute');
+const userRoute = require('./routes/userRoute');
 const authRoute = require('./routes/authRoute');
 
 // Configuring the env file
@@ -16,9 +17,10 @@ const app = express();
 // Setting up the middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));        // Middleware to parse URL-encoded bodies
+app.use(cookieParser());                                // Middleware to parse the cookies
 
 // Setting up the routes
-// app.use('/api/user', userRoute);
+app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
 
 // Starting the Express App server
@@ -38,6 +40,5 @@ app.use((err, req, res, next) => {
         success: false,
         statusCode,
         message
-
     });
 });

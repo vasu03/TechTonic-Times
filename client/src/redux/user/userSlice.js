@@ -31,11 +31,30 @@ const userSlice = createSlice({
         signInFailure: (state, action) => {
             state.loading = false;
             state.error = action.payload;
-        }
+        },
+
+        // when we start the User update process
+        updateStart: (state, action) => {
+            state.loading = true;
+            state.error = null;
+        },
+
+        // If updation successful
+        updateSuccess: (state, action) => {
+            state.currentUser = action.payload;
+            state.loading = false;
+            state.error = null;
+        },
+
+        // If updation fails
+        updateFailure: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        },
     },
 });
 
 // exporting our functions/reducers
-export const { signInStart, signInSuccess, signInFailure } = userSlice.actions;
+export const { signInStart, signInSuccess, signInFailure, updateStart, updateSuccess, updateFailure } = userSlice.actions;
 // exporting our Reducer to have it in our redux-store
 export default userSlice.reducer;
