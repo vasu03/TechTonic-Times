@@ -1,25 +1,34 @@
 // Importing required modules
-import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Button, TextInput } from 'flowbite-react';
+import React, { useEffect, useRef, useState } from "react";
+import { Alert, Button, Modal, TextInput } from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from "../../firebase";
 
-// Importing global states from Redux-Store
+// Importing global states from our Redux-Store
 import { useDispatch, useSelector } from "react-redux";
-import { updateStart, updateSuccess, updateFailure } from "../../redux/user/userSlice"; 
+import { updateStart, updateSuccess, updateFailure } from "../../redux/user/userSlice";
+import { deleteStart, deleteSuccess, deleteFailure } from "../../redux/user/userSlice";
+import { signOutSuccess } from "../../redux/user/userSlice";
 
 // Dashboard Profile component
 const DashProfile = () => {
+  // Initialize the hooks
   const dispatch = useDispatch();
 
   // Retrieve current user information from Redux store global state
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, error } = useSelector((state) => state.user);
 
-  // States to manage image file and its upload
+  // States to manage profile image file and its upload
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploading, setImageFileUploading] = useState(null);
   const [imageFileUploadingError, setImageFileUploadingError] = useState(null);
+
+  // States to manage the deletion of user
+  const [ showPopup, setShowPopup ] = useState(false); 
+  
+  // States to manage profile update for user
   const [formData, setFormData] = useState({});
   const [userUpdateSuccess, setUserUpdateSuccess] = useState(null);
   const [userUpdateError, setUserUpdateError] = useState(null);
@@ -27,7 +36,7 @@ const DashProfile = () => {
   // Reference to file input element
   const filePickerRef = useRef();
 
-  // Function to handle image change
+  // Function to handle Image Change
   const handleImageChange = (e) => {
     const file = e.target.files[0];                   // capture the img from input field
     if (file) {
@@ -53,7 +62,7 @@ const DashProfile = () => {
 
     // start the upload to firebase storage
     uploadTask.on(
-      'state_changed',
+      "state_changed",
       (snapshot) => {
         // Take snapshots as the image is uploading
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -81,6 +90,7 @@ const DashProfile = () => {
   const handleUserFormChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
   // Function to handle the submission of the User data form
   const handleUserFormSubmit = async (e) => {
     setUserUpdateSuccess(null);
@@ -96,8 +106,12 @@ const DashProfile = () => {
       setUserUpdateError("Please wait for image to be uploaded...");
       return;
     }
+
+    // Updating the User profile details
     try {
       dispatch(updateStart());
+
+      // get a response from the backend
       const res = await fetch(`api/user/update/${currentUser._id}` , {
         method: "PUT",
         headers: {
@@ -123,17 +137,62 @@ const DashProfile = () => {
     }
   };
 
+  // Function to handle the Deletion of user
+  const handleDeleteUser = async (e) => {
+    setShowPopup(false);
+    try {
+      dispatch(deleteStart());
+
+      // get a response from the backend
+      const res = await fetch(`api/user/delete/${currentUser._id}` , {
+        method: "DELETE",
+      });
+
+       // Get the data from the response
+       const data = await res.json();
+       // If there is some error 
+       if(!res.ok){
+         dispatch(deleteFailure(data.message));
+       }
+       // If no error then procees furthur
+       else{
+         dispatch(deleteSuccess(data));
+       }
+    } catch (error) {
+      dispatch(deleteFailure(error.message));
+    }
+  }
+
+  // Function to handle the User SignOut
+  const handleSignOut = async (e) => {
+    try {
+      const res = await fetch("/api/auth/signOut", {
+        method: "POST",
+      });
+
+      const data = res.json();
+      if(!res.ok){
+        console.log(data,message);
+      }else{
+        dispatch(signOutSuccess());
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   // JSX to render the component
   return (
-    <div className='max-w-lg mx-auto w-full p-3'>
-      <h1 className='my-3 text-center font-medium text-2xl'>Profile</h1>
+
+    <div className="max-w-lg mx-auto w-full p-3">
+      <h1 className="my-3 text-center font-medium text-2xl">Profile</h1>
       {/* Form having all the User details */}
-      <form className='flex flex-col gap-3' onSubmit={handleUserFormSubmit}>
+      <form className="flex flex-col gap-3" onSubmit={handleUserFormSubmit}>
         {/* Input element to select image file */}
-        <input type="file" accept='image/*' onChange={handleImageChange} ref={filePickerRef} hidden />
-        {/* Display selected image or current user's profile picture */}
+        <input type="file" accept="image/*" onChange={handleImageChange} ref={filePickerRef} hidden />
+        {/* Display selected image or current user"s profile picture */}
         <div className="w-24 h-24 self-center rounded-full" onClick={() => filePickerRef.current.click()}>
-          <img src={imageFileUrl || currentUser.profilePicture} alt='img' className='object-cover rounded-full w-full h-full cursor-pointer' style={{ boxShadow: "0px 0px 3px 3px #64748b" }} />
+          <img src={imageFileUrl || currentUser.profilePicture} alt="img" className="object-cover rounded-full w-full h-full cursor-pointer" style={{ boxShadow: "0px 0px 3px 3px #64748b" }} />
         </div>
         {/* Progress bar to show image upload progress */}
         {imageFileUploading !== null && (
@@ -141,34 +200,62 @@ const DashProfile = () => {
         )}
         {/* Alert to display upload error */}
         {imageFileUploadingError !== null && (
-          <Alert color='failure'>
+          <Alert color="failure">
             {imageFileUploadingError}
           </Alert>
         )}
         {/* Text input fields for username, email, and password */}
-        <TextInput type='text' id='userName' placeholder='Username' defaultValue={currentUser.userName} onChange={handleUserFormChange}/>
-        <TextInput type='email' id='email' placeholder='Email' defaultValue={currentUser.email} onChange={handleUserFormChange}/>
-        <TextInput type='password' id='password' placeholder='Password' onChange={handleUserFormChange}/>
+        <TextInput type="text" id="userName" placeholder="Username" defaultValue={currentUser.userName} onChange={handleUserFormChange}/>
+        <TextInput type="email" id="email" placeholder="Email" defaultValue={currentUser.email} onChange={handleUserFormChange}/>
+        <TextInput type="password" id="password" placeholder="Password" onChange={handleUserFormChange}/>
         {/* Button to submit form */}
-        <Button type='submit' gradientDuoTone='greenToBlue' outline>Update</Button>
+        <Button type="submit" gradientDuoTone="greenToBlue" outline>Update</Button>
       </form>
       {/* Links for account deletion and sign out */}
       <div className="mt-4 text-red-500 text-xs w-full flex items-center justify-between">
-        <span className='cursor-pointer'>Delete Account</span>
-        <span className='cursor-pointer'>Sign Out</span>
+        <span className="cursor-pointer" onClick={() => setShowPopup(true)} >Delete Account</span>
+        <span className="cursor-pointer" onClick={handleSignOut} >Sign Out</span>
       </div>
+      
       {/* Alert to display updation success */}
         {userUpdateSuccess !== null && (
-          <Alert color='success' className='mt-5'>
+          <Alert color="success" className="mt-5">
             {userUpdateSuccess}
           </Alert>
         )}
+
       {/* Alert to display updation Failure */}
         {userUpdateError !== null && (
-          <Alert color='failure' className='mt-5'>
+          <Alert color="failure" className="mt-5">
             {userUpdateError}
           </Alert>
         )}
+      
+      {/* A popup for confirmation while deleting a user */}
+        {showPopup && (
+          <Modal show={showPopup} onClose={() => setShowPopup(false)} popup size="md">
+            <Modal.Header />
+            <Modal.Body>
+              <div className="text-center">
+                <HiOutlineExclamationCircle className="w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto"/>
+                <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">Are you sure, you want to delete your account ?</h3>
+              </div>
+              <div className="flex flex-col justify-center items-center gap-3 sm:flex-row">
+                <Button color="failure" onClick={handleDeleteUser} >Yes, I'm sure</Button>
+                <Button color="gray" onClick={() => setShowPopup(false)} >No, Cancel</Button>
+                
+              </div>
+            </Modal.Body>
+          </Modal>
+        )}
+
+        {/* Alert to display deletion Failure */}
+        {error !== null && (
+          <Alert color="failure" className="mt-5">
+            {error}
+          </Alert>
+        )}
+
     </div>
   );
 };

@@ -1,7 +1,12 @@
 // Importing Required Modules
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+// Importing our custom data models
 const User = require("../models/userModel");
+
+// Importing our Custom middlewares
+const { errorHandler } = require("../middlewares/errorHandler");
 const { validateUserRegistration, validateUserLogin } = require("../middlewares/authUserValidattion");
 
 
@@ -17,8 +22,8 @@ exports.signUp = async (req, res, next) => {
         // Check if the user already exist
         const emailExist = await User.findOne({ email });
         const userNameExist = await User.findOne({ userName });
-        if( userNameExist || emailExist ){
-            throw new Error("Username or Email already exists");    
+        if( userNameExist || emailExist ){  
+            return next(errorHandler(400, "Username or Email already exists..."));    
         }
 
         // Protecting the credentials
@@ -41,6 +46,7 @@ exports.signUp = async (req, res, next) => {
     }
 };
 
+
 // Creating a signIn Controller Function
 exports.signIn = async (req, res, next) => {
     try {
@@ -53,25 +59,26 @@ exports.signIn = async (req, res, next) => {
         // Checking if the email exists
         const validUser = await User.findOne({ email: email });
         if (!validUser) {
-            throw new Error("User do not Exist"); 
+            return next(errorHandler(404, "User not found...")); 
         }
 
         // Check password validity
         const validPass = bcrypt.compareSync(password, validUser.password);
         if (!validPass) {
-            throw new Error("Invalid Email or Password");
+            return next(errorHandler(400, "Invalid Email or Password..."));
         }
 
         // Create a token
         const token = jwt.sign( { id: validUser._id }, process.env.JWT_SECRET);
         // Exclude the password from user
         const { password: passwd, ...rest } = validUser._doc;
-        res.status(200).cookie('token', token, {httpOnly: true}).json(rest);
+        res.status(200).cookie("token", token, {httpOnly: true}).json(rest);
 
     } catch (error) {
         next(error);
     }
 };
+
 
 // Creating a Google req handler Controller function
 exports.google = async (req, res, next) => {
@@ -83,7 +90,7 @@ exports.google = async (req, res, next) => {
         if(userExist){
             const token = jwt.sign({id: userExist._id}, process.env.JWT_SECRET);
             const { password: passwd, ...rest } = userExist._doc;
-            res.status(200).cookie('token', token, {httpOnly: true}).json(rest);
+            res.status(200).cookie("token", token, {httpOnly: true}).json(rest);
         } else{
             // Else if the user do not exist then create a new User
             // Generate a random pass of length = 16 ...(8 + 8) as it is required in our model
@@ -96,7 +103,7 @@ exports.google = async (req, res, next) => {
             const newUser = new User({
                 // Convert the username in such a format that it is always unique
                 // Test User => testuser6519        ... here we lowercase, split at space, join them and add a random 4 digit value to it
-                userName: name.toLowerCase().split(' ').join('') + Math.random().toString(9).slice(-4),
+                userName: name.toLowerCase().split(" ").join("") + Math.random().toString(9).slice(-4),
                 email: email,
                 password: hashedPassword,
                 profilePicture: googlePhotoUrl
@@ -106,9 +113,19 @@ exports.google = async (req, res, next) => {
 
             const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET);
             const { password: passwd, ...rest } = newUser._doc;
-            res.status(200).cookie('token', token, {httpOnly: true}).json(rest);
+            res.status(200).cookie("token", token, {httpOnly: true}).json(rest);
         }
     } catch (error) {
         next(error);
     };
 }; 
+
+
+// Creating a signOut Controller Function
+exports.signOut = async (req, res, next) => {
+    try {
+        res.clearCookie('token').status(200).json("User has been Signed Out...");
+    } catch (error) {
+        next(error);
+    }
+};

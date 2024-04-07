@@ -39,7 +39,7 @@ const userSlice = createSlice({
             state.error = null;
         },
 
-        // If updation successful
+        // If updation is successful
         updateSuccess: (state, action) => {
             state.currentUser = action.payload;
             state.loading = false;
@@ -51,10 +51,48 @@ const userSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
+
+        // When we start the Deletion process
+        deleteStart: (state, action) => {
+            state.loading = true;
+            state.error = null;
+        },
+
+        // If deletion is successful
+        deleteSuccess: (state, action) => {
+            state.currentUser = null;
+            state.loading = false;
+            state.error = null;
+        },
+
+        // If deletion fails
+        deleteFailure: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        },
+
+        // If the Signout is successful
+        signOutSuccess: (state, action) => {
+            state.currentUser = null;
+            state.loading = false;
+            state.error = null;
+        },
     },
 });
 
 // exporting our functions/reducers
-export const { signInStart, signInSuccess, signInFailure, updateStart, updateSuccess, updateFailure } = userSlice.actions;
+export const {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+  updateStart,
+  updateSuccess,
+  updateFailure,
+  deleteStart,
+  deleteSuccess,
+  deleteFailure,
+  signOutSuccess
+} = userSlice.actions;
+
 // exporting our Reducer to have it in our redux-store
 export default userSlice.reducer;
