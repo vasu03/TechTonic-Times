@@ -15,6 +15,10 @@
     font-family: "Poppins", sans-serif;
 }
 
+body{
+    height: 100vh;
+}
+
 /* Global Scrollbar Styling */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-thumb {
@@ -35,4 +39,10 @@ progress::-webkit-progress-bar { background: transparent; }
 progress::-webkit-progress-value {
     background: linear-gradient(to right, #4CAF50, #2196F3);
     border-radius: 10px;
+}
+
+/* Styles for the React Quill Editor */
+/* Specifically Text Input Area */
+.ql-editor{
+    font-size: 1.03rem;         /* add extra 3% to whatever it's at a instant */
 }

@@ -1,7 +1,12 @@
 // Importing required modules
 import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from 'react-router-dom';
+
+// Importing components and icons
 import { Alert, Button, Modal, TextInput } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+
+// Importing Firebase api
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from "../../firebase";
 
@@ -17,7 +22,7 @@ const DashProfile = () => {
   const dispatch = useDispatch();
 
   // Retrieve current user information from Redux store global state
-  const { currentUser, error } = useSelector((state) => state.user);
+  const { currentUser, error, loading } = useSelector((state) => state.user);
 
   // States to manage profile image file and its upload
   const [imageFile, setImageFile] = useState(null);
@@ -209,7 +214,17 @@ const DashProfile = () => {
         <TextInput type="email" id="email" placeholder="Email" defaultValue={currentUser.email} onChange={handleUserFormChange}/>
         <TextInput type="password" id="password" placeholder="Password" onChange={handleUserFormChange}/>
         {/* Button to submit form */}
-        <Button type="submit" gradientDuoTone="greenToBlue" outline>Update</Button>
+        <Button type="submit" gradientDuoTone="greenToBlue" outline disabled={loading || imageFileUploading} >
+          { loading ? "Loading" : "Update"}
+        </Button>
+        {/* Create post button if the user is Admin otherwise not */}
+        {
+          currentUser.isAdmin && (
+            <Link to="/createPost" >
+              <Button type="button" gradientDuoTone="pinkToOrange" outline className="w-full">Create Post</Button>
+            </Link>
+          )
+        }
       </form>
       {/* Links for account deletion and sign out */}
       <div className="mt-4 text-red-500 text-xs w-full flex items-center justify-between">

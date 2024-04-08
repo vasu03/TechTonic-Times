@@ -69,7 +69,7 @@ exports.signIn = async (req, res, next) => {
         }
 
         // Create a token
-        const token = jwt.sign( { id: validUser._id }, process.env.JWT_SECRET);
+        const token = jwt.sign( { id: validUser._id, isAdmin: validUser.isAdmin }, process.env.JWT_SECRET);
         // Exclude the password from user
         const { password: passwd, ...rest } = validUser._doc;
         res.status(200).cookie("token", token, {httpOnly: true}).json(rest);
@@ -88,7 +88,7 @@ exports.google = async (req, res, next) => {
     try {
         const userExist = await User.findOne({ email });
         if(userExist){
-            const token = jwt.sign({id: userExist._id}, process.env.JWT_SECRET);
+            const token = jwt.sign({id: userExist._id, isAdmin: userExist.isAdmin}, process.env.JWT_SECRET);
             const { password: passwd, ...rest } = userExist._doc;
             res.status(200).cookie("token", token, {httpOnly: true}).json(rest);
         } else{
@@ -111,7 +111,7 @@ exports.google = async (req, res, next) => {
 
             await newUser.save();
 
-            const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET);
+            const token = jwt.sign({id: newUser._id, isAdmin: newUser.isAdmin}, process.env.JWT_SECRET);
             const { password: passwd, ...rest } = newUser._doc;
             res.status(200).cookie("token", token, {httpOnly: true}).json(rest);
         }
