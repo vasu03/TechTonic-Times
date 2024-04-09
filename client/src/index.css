@@ -42,7 +42,12 @@ progress::-webkit-progress-value {
 }
 
 /* Styles for the React Quill Editor */
-/* Specifically Text Input Area */
+.ql-toolbar.ql-snow + .ql-container.ql-snow{ border: none; }
+.ql-toolbar{
+    background: #f9fafb;
+    border: 2px solid #f9fafb;
+    border-radius: inherit;
+}
 .ql-editor{
     font-size: 1.03rem;         /* add extra 3% to whatever it's at a instant */
 }

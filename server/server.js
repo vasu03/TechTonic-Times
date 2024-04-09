@@ -6,6 +6,7 @@ const { dbConnect } = require('./database/dbConnection');
 // Importing the routes
 const userRoute = require('./routes/userRoute');
 const authRoute = require('./routes/authRoute');
+const postRoute = require('./routes/postRoute');
 
 // Configuring the env file
 const dotenv = require("dotenv");
@@ -22,6 +23,7 @@ app.use(cookieParser());                                // Middleware to parse t
 // Setting up the routes
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/post', postRoute);
 
 // Starting the Express App server
 const PORT = process.env.PORT || 5000;

@@ -35,7 +35,7 @@ const CreatePost = () => {
                 <Button type="button" gradientMonochrome="teal" size="sm" className="flex-auto">Upload Image</Button>
             </div>
             {/* Post body input container */}
-            <ReactQuill theme="snow" placeholder="Write something here..." required className="h-72 mb-14"/>
+            <ReactQuill theme="snow" placeholder="Write something here..." required className="h-72 md:mb-1 border-2 rounded-md border-gray-300 dark:border-gray-700"/>
             <Button type="submit" gradientMonochrome="teal" size="sm">Publish Post</Button>
         </form>
     </div>
