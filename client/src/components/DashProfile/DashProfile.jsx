@@ -78,13 +78,14 @@ const DashProfile = () => {
         setImageFileUploadingError("Can't upload Image (Image must be less than 2 MB) or (it must be of type Image)...");
         setImageFileUploading(null);
         setImageFile(null);
-        setImageFileUrl(null)
+        setImageFileUrl(null);
       },
       () => {
         // Get download URL after successful upload and update the user Record
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setImageFileUrl(downloadURL);
           setImageFileUploading(null);
+          setImageFileUploadingError(null);
           setFormData({ ...formData, profilePicture: downloadURL });
         });
       },
@@ -132,9 +133,9 @@ const DashProfile = () => {
         dispatch(updateFailure(data.message));
         setUserUpdateError(data.message);
       }
-      // If no error then procees furthur
+      // If no error then procees further
       else{
-        dispatch(updateSuccess(data));
+        dispatch(updateSuccess(data)); 
         setUserUpdateSuccess("Profile updated successfully...");
       }
     } catch (error) {
@@ -203,7 +204,7 @@ const DashProfile = () => {
         {imageFileUploading !== null && (
           <progress value={imageFileUploading} max="100" />
         )}
-        {/* Alert to display upload error */}
+        {/* Alert to display image upload error */}
         {imageFileUploadingError !== null && (
           <Alert color="failure">
             {imageFileUploadingError}
@@ -214,7 +215,7 @@ const DashProfile = () => {
         <TextInput type="email" id="email" placeholder="Email" defaultValue={currentUser.email} onChange={handleUserFormChange}/>
         <TextInput type="password" id="password" placeholder="Password" onChange={handleUserFormChange}/>
         {/* Button to submit form */}
-        <Button type="submit" gradientDuoTone="greenToBlue" outline disabled={loading || imageFileUploading} >
+        <Button type="submit" gradientDuoTone="greenToBlue" outline disabled={loading || imageFileUploading } >
           { loading ? "Loading" : "Update"}
         </Button>
         {/* Create post button if the user is Admin otherwise not */}
