@@ -1,5 +1,6 @@
 // Importing required modules
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Importing Firebase api
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
@@ -12,6 +13,9 @@ import { Button, FileInput, Select, TextInput, Alert } from "flowbite-react";
 
 // Creating a page for Creating Posts
 const CreatePost = () => {
+
+    // Initialize the hooks
+    const navigate = useNavigate(); 
     
     // States handling the Image file uploading
     const [ imageFile, setImageFile ] = useState(null);
@@ -20,8 +24,10 @@ const CreatePost = () => {
     const [imageFileUploadingError, setImageFileUploadingError] = useState(null);
     const [imageFileUploadingSuccess, setImageFileUploadingSuccess] = useState(null);
 
-    // States to manage profile update for user
+    // States to manage Post form contents
     const [formData, setFormData] = useState({});
+    const [postPublishError, setPostPublishError] = useState(null);
+
 
     // Fucntion handling the uploading of image
     const uploadImage = async () => {
@@ -35,7 +41,7 @@ const CreatePost = () => {
             // .If the image exists
             setImageFileUploadingError(null);
             const storage = getStorage();
-            const imgFileName = new Date().getTime() + "-" + imageFile.name;
+            const imgFileName = formData.title + "-" + new Date().getTime() + "-" + imageFile.name;
             const storageRef = ref(storage, imgFileName);
             const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
@@ -75,6 +81,38 @@ const CreatePost = () => {
         }
     }
 
+    // Funciton to handle the Publishing of Post formData
+    const handlePostPublish = async (e) => {
+        e.preventDefault();
+
+        try {
+            // Mget the response from server by making a request
+            const res = await fetch("/api/post/createPost", {
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json"
+                },
+                body: JSON.stringify(formData)
+            });
+
+            // convert the data into JSON
+            const data = await res.json();
+
+            // If the response is not okay then stop publishing
+            if(!res.ok){
+                setPostPublishError(data.message);
+                return;
+            }
+            // If the response is okay then navigate to a specific route
+            else if(res.ok){
+                setPostPublishError(null);
+                navigate(`/post/${data.slug}`);
+            }
+        } catch (error) {
+            setPostPublishError("Something went wrong...");
+        }
+    }
+
 
     // JSX for rendering our element
     return (
@@ -82,11 +120,30 @@ const CreatePost = () => {
         {/* Title of the page */}
         <h1 className="text-center text-2xl my-5 font-semibold">Create a Post</h1>
         {/* Form to fill content of the post */}
-        <form action="" className="flex flex-col gap-4">
+        <form action="" className="flex flex-col gap-4" onSubmit={handlePostPublish} >
             {/* Post title and Category container */}
             <div className="flex flex-col gap-4 sm:flex-row justify-between">
-                <TextInput type="text" placeholder="Title of Post" required id="title" className="flex-1"/>
-                <Select>
+                <TextInput 
+                    type="text" 
+                    placeholder="Title of Post" 
+                    required 
+                    id="title" 
+                    className="flex-1" 
+                    onChange={ 
+                        (e) => {
+                            setPostPublishError(null);
+                            setFormData({ ...formData, title: e.target.value })
+                        } 
+                    }
+                />
+                <Select 
+                    onChange={ 
+                        (e) => {
+                            setPostPublishError(null);
+                            setFormData({ ...formData, category: e.target.value })
+                        } 
+                    }
+                >
                     <option value="uncategorized">Select a Category</option>
                     <option value="html">HTML</option>
                     <option value="css">CSS</option>
@@ -99,9 +156,26 @@ const CreatePost = () => {
 
             {/* Image file uploading container */}
             <div className="flex flex-col sm:flex-row gap-3 justify-between border-2 rounded-md border-gray-300 dark:border-gray-700 p-3">
-                <FileInput type="file" accept="image/*" className="flex-auto" onChange={(e) => setImageFile(e.target.files[0])} />
-                <Button type="button" gradientMonochrome="teal" size="sm" className="flex-auto" onClick={uploadImage} >Upload Image</Button>
+                <FileInput 
+                    type="file" 
+                    accept="image/*" 
+                    className="flex-auto" 
+                    onChange={
+                        (e) => {
+                            setPostPublishError(null);
+                            setImageFile(e.target.files[0])
+                        }
+                    } 
+                />
+                <Button 
+                    type="button" 
+                    gradientMonochrome="teal" 
+                    size="sm" 
+                    className="flex-auto" 
+                    onClick={uploadImage} 
+                >Upload Image</Button>
             </div>
+
             {/* Progress bar to show image upload progress */}
             {imageFileUploading !== null && (
                 <progress value={imageFileUploading} max="100" />
@@ -112,7 +186,7 @@ const CreatePost = () => {
                     {imageFileUploadingError}
                 </Alert>
             )}
-            {/* Alert to display image upload upload succes */}
+            {/* Alert to display image upload succes */}
             {imageFileUploadingSuccess !== null && (
                 <Alert color="success">
                     {imageFileUploadingSuccess}
@@ -124,9 +198,26 @@ const CreatePost = () => {
             )}
 
             {/* Post body input container */}
-            <ReactQuill theme="snow" placeholder="Write something here..." required className="h-72 md:mb-1 border-2 rounded-md border-gray-300 dark:border-gray-700"/>
-            <Button type="submit" gradientMonochrome="teal" size="sm">Publish Post</Button>
+            <ReactQuill 
+                theme="snow" 
+                placeholder="Write something here..." 
+                required 
+                className="h-72 md:mb-1 border-2 rounded-md border-gray-300 dark:border-gray-700"
+                onChange={ 
+                    (value) => {
+                        setPostPublishError(null);
+                        setFormData({ ...formData, content: value })
+                    } 
+                }
+            />
+            <Button type="submit" gradientMonochrome="teal" size="sm" className="mb-5">Publish Post</Button>
         </form>
+        {/* Alert to display post publish error */}
+        {postPublishError !== null && (
+                <Alert color="failure">
+                    {postPublishError}
+                </Alert>
+            )}
     </div>
   )
 }
