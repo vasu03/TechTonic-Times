@@ -4,10 +4,10 @@ import { Link, useLocation } from "react-router-dom";
 import { Sidebar } from "flowbite-react";
 
 // Importing the Icons
-import { HiArrowSmRight, HiUser } from "react-icons/hi";
+import { HiArrowSmRight, HiDocumentText, HiUser } from "react-icons/hi";
 
 // Importing global states from Redux-Store
-import { useDispatch } from "react-redux"; 
+import { useDispatch, useSelector } from "react-redux"; 
 import { signOutSuccess } from "../../redux/user/userSlice";
 
 // Creating our Dashboard SideBar component
@@ -16,6 +16,7 @@ const DashSidebar = () => {
     const dispatch = useDispatch();
     const location = useLocation();
     
+    const { currentUser } = useSelector((state) => state.user);
     // States to manage the tabs of the sidebar
     const [tab, setTab] = useState("");
 
@@ -49,14 +50,16 @@ const DashSidebar = () => {
     // JSX to render the component
     return (
         <Sidebar className="w-full md:w-56">
+
             <Sidebar.Items>
+                <Sidebar.ItemGroup className="flex flex-col gap-3">
+
                 {/* User profile link */}
-                <Sidebar.ItemGroup>
                     <Link to="/dashboard?tab=profile"> 
                         <Sidebar.Item 
                             active={tab === "profile"} 
                             icon={HiUser} 
-                            label={"User"} 
+                            label={ currentUser.isAdmin ? "Admin" : "User" } 
                             labelColor="dark" 
                             className="cursor-pointer" 
                             as="div"
@@ -64,7 +67,24 @@ const DashSidebar = () => {
                             Profile
                         </Sidebar.Item>
                     </Link>
+
+                {/* Posts button */}
+                    { currentUser.isAdmin && (
+                        <Link to="/dashboard?tab=posts"> 
+                            <Sidebar.Item 
+                                active={tab === "posts"} 
+                                icon={HiDocumentText} 
+                                labelColor="dark" 
+                                className="cursor-pointer" 
+                                as="div"
+                            >
+                                Posts
+                            </Sidebar.Item>
+                        </Link>
+                    )}
+
                 </Sidebar.ItemGroup>
+
                 {/* Sign-out button */}
                 <Sidebar.ItemGroup>
                     <Sidebar.Item 
