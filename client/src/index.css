@@ -20,12 +20,12 @@ body{
 }
 
 /* Global Scrollbar Styling */
-::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(to bottom, #bcf0da, #31c48d, #0891b2);
     border-radius: 6px;
 }
-::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-track { background: #f2f2f2; border-radius: 10%; }
 
 /* Global Progress Bar styling */
 progress {

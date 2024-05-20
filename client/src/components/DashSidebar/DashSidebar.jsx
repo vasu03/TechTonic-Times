@@ -50,7 +50,6 @@ const DashSidebar = () => {
     // JSX to render the component
     return (
         <Sidebar className="w-full md:w-56">
-
             <Sidebar.Items>
                 <Sidebar.ItemGroup className="flex flex-col gap-3">
 

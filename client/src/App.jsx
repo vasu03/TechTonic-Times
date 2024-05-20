@@ -10,6 +10,7 @@ import Projects from "./pages/Projects";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import CreatePost from './pages/CreatePost';
+import UpdatePost from './pages/UpdatePost';
 
 // Importing our custom components
 import Header from "./components/Header/Header";
@@ -32,8 +33,9 @@ const App = () => {
         <Route element={<PrivateRoute/>}>          {/* make the dashboard private  */} 
           <Route path='/dashboard' element={<Dashboard/>} />
         </Route>
-        <Route element={<AdminPrivateRoute/>}>          {/* make the create post page private  */}
+        <Route element={<AdminPrivateRoute/>}>          {/* make the create & update post page private  */}
           <Route path='/createPost' element={<CreatePost/>} />
+          <Route path='/updatePost/:postId' element={<UpdatePost/>} />
         </Route>
         <Route path='/projects' element={<Projects/>} />
       </Routes>
