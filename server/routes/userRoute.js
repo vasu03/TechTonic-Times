@@ -2,7 +2,7 @@
 const express = require('express');
 
 // Importing our Custom controllers
-const { updateUser, deleteUser } = require('../controllers/userController');
+const { updateUser, deleteUser, getUsers } = require('../controllers/userController');
 
 // Importing our Custom middlewares
 const { verifyUser } = require('../middlewares/verifyUser');
@@ -13,6 +13,7 @@ const router = express.Router();
 // Defining the routes
 router.put("/update/:userId", verifyUser, updateUser);
 router.delete("/delete/:userId", verifyUser, deleteUser);
+router.get("/getUsers", verifyUser, getUsers);
 
 // Exporting the router
 module.exports = router;

@@ -1,12 +1,12 @@
 // Importing required modules
-const express = require('express');
+const express = require("express");
 const cookieParser = require("cookie-parser");
-const { dbConnect } = require('./database/dbConnection');
+const { dbConnect } = require("./database/dbConnection");
 
 // Importing the routes
-const userRoute = require('./routes/userRoute');
-const authRoute = require('./routes/authRoute');
-const postRoute = require('./routes/postRoute');
+const userRoute = require("./routes/userRoute");
+const authRoute = require("./routes/authRoute");
+const postRoute = require("./routes/postRoute");
 
 // Configuring the env file
 const dotenv = require("dotenv");
@@ -21,11 +21,12 @@ app.use(express.urlencoded({ extended: true }));        // Middleware to parse U
 app.use(cookieParser());                                // Middleware to parse the cookies
 
 // Setting up the routes
-app.use('/api/user', userRoute);
-app.use('/api/auth', authRoute);
-app.use('/api/post', postRoute);
+app.use("/api/user", userRoute);
+app.use("/api/auth", authRoute);
+app.use("/api/post", postRoute);
 
 // Starting the Express App server
+
 const PORT = process.env.PORT || 5000;
 dbConnect().then(() => {
     console.log("Server Connected to DB...");
@@ -37,7 +38,7 @@ dbConnect().then(() => {
 // Express Global Error Handler
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
-    const message = err.message || 'Internal Server Error';
+    const message = err.message || "Internal Server Error";
     res.status(statusCode).json({
         success: false,
         statusCode,
