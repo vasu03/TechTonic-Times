@@ -1,6 +1,7 @@
 // Importing required modules
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 // Importing custom modules
 import About from "./pages/About";
@@ -40,6 +41,7 @@ const App = () => {
         <Route path='/projects' element={<Projects/>} />
       </Routes>
       <FooterSection />                                {/* placed under BrowserRouter.. so, that is shown on all pages */}
+      <Toaster /> 
     </BrowserRouter>  
   );
 };

@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Sidebar } from "flowbite-react";
 
 // Importing the Icons
-import { HiArrowSmRight, HiDocumentText, HiUser } from "react-icons/hi";
+import { HiArrowSmRight, HiDocumentText, HiOutlineUserGroup, HiUser } from "react-icons/hi";
 
 // Importing global states from Redux-Store
 import { useDispatch, useSelector } from "react-redux"; 
@@ -78,6 +78,21 @@ const DashSidebar = () => {
                                 as="div"
                             >
                                 Posts
+                            </Sidebar.Item>
+                        </Link>
+                    )}
+
+                {/* Users button */}
+                    { currentUser.isAdmin && (
+                        <Link to="/dashboard?tab=users"> 
+                            <Sidebar.Item 
+                                active={tab === "users"} 
+                                icon={HiOutlineUserGroup} 
+                                labelColor="dark" 
+                                className="cursor-pointer" 
+                                as="div"
+                            >
+                                Users
                             </Sidebar.Item>
                         </Link>
                     )}

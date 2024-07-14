@@ -7,6 +7,7 @@ import { HiOutlineChevronDoubleRight } from "react-icons/hi";
 import DashSidebar from "../components/DashSidebar/DashSidebar";
 import DashProfile from "../components/DashProfile/DashProfile";
 import DashPost from "../components/DashPost/DashPost";
+import DashUsers from "../components/DashUsers/DashUsers";
 
 // Creating our Dashboard
 const Dashboard = () => {
@@ -43,6 +44,8 @@ const Dashboard = () => {
         { tab === "profile" && <DashProfile /> }
         {/* Posts Tab */}
         { tab === "posts" && <DashPost /> }
+        {/* Users Tab */}
+        { tab === "users" && <DashUsers /> }
       </div>
 
     </div>
