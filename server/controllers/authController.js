@@ -124,8 +124,96 @@ exports.google = async (req, res, next) => {
 // Creating a signOut Controller Function
 exports.signOut = async (req, res, next) => {
     try {
-        res.clearCookie('token').status(200).json("User has been Signed Out...");
+        res.clearCookie("token").status(200).json({message:"User has been Signed Out."});
     } catch (error) {
         next(error);
     }
 };
+
+
+// Creating a Update User Controller Function3
+exports.updateUserAccount = async (req, res, next) => {
+    try {
+        // Destructure the incoming data
+        const { userName, email, password, profilePicture } = req.body;
+
+        // Check if user from params and cookie are the same
+        if (req.user.id !== req.params.userId) {
+            return next(errorHandler(403, "You are not allowed to update this account..."));
+        }
+
+        // create a updated fields empty object
+        const updateFields = {};
+
+        // Check if the password length is not proper
+        if (password) {
+            if (password.length < 8) {
+                return next(errorHandler(400, "Password should have at least 8 characters..."));
+            }
+            // Encrypt the password
+            const salt = await bcrypt.genSalt(10);
+            // set the encrypted password into updated field objects
+            updateFields.password = await bcrypt.hash(password, salt);
+        }
+
+        // Put a constraint on Username
+        if (userName) {
+            // A regex to specify the format of Username
+            const userNamePatternRegex = /^[a-zA-Z0-9_]+$/;
+
+            // Check the Username format
+            if (userName.length < 7 || userName.length > 20) {
+                return next(errorHandler(400, "Username must be between 7 to 20 characters..."));
+            } else if (userName.includes(" ")) {
+                return next(errorHandler(400, "No spaces allowed in Username..."));
+            } else if (!userNamePatternRegex.test(userName)) {
+                return next(errorHandler(400, "Only Letters, Numbers and _ are allowed..."));
+            }
+            // set the username into updated field objects
+            updateFields.userName = userName;
+        }
+
+        if (email) {
+            // set the email into updated field objects
+            updateFields.email = email;
+        }
+
+        if (profilePicture) {
+            // set the profile pic into updated field objects
+            updateFields.profilePicture = profilePicture;
+        }
+
+        // If there are fields to update, update the user
+        if (Object.keys(updateFields).length > 0) {
+            const updatedUser = await User.findByIdAndUpdate(
+                req.params.userId,
+                { $set: updateFields },
+                { new: true }
+            );
+
+            const { password: hashedPassword, ...rest } = updatedUser._doc;
+            res.status(200).json(rest);
+        } else {
+            res.status(400).json({ message: "Nothing new to update" });
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+// Creating a Delete Account controller function (secured by auth)
+exports.deleteUserAccount = async (req, res, next) => {
+    // Check if user from params and cookie are same
+    if(req.user.id !== req.params.userId){
+        return next(errorHandler(403, "You are not allowed to delete this account."));
+    }
+
+    // Delete the user details
+    try {
+        await User.findByIdAndDelete(req.params.userId);
+        res.status(200).json("Account has been Deleted.");
+    } catch (error) {
+        next(error);
+    }
+}

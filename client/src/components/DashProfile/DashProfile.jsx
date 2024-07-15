@@ -1,6 +1,7 @@
 // Importing required modules
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 // Importing components and icons
 import { Alert, Button, Modal, TextInput } from "flowbite-react";
@@ -75,7 +76,8 @@ const DashProfile = () => {
       },
       (error) => {
         // throw the error(if any)
-        setImageFileUploadingError("Can't upload Image (Image must be less than 2 MB) or (it must be of type Image)...");
+        toast.error("Can't upload image");
+        setImageFileUploadingError("Image must be less than 2 MB & it must be of type Image.");
         setImageFileUploading(null);
         setImageFile(null);
         setImageFileUrl(null);
@@ -97,19 +99,19 @@ const DashProfile = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // Function to handle the submission of the User data form
-  const handleUserFormSubmit = async (e) => {
+  // Function to handle the updation of the User acc data form
+  const handleUpdateUserAccount = async (e) => {
     setUserUpdateSuccess(null);
     setUserUpdateError(null);
     e.preventDefault();
     // If no form data then avoid submission of form
     if(Object.keys(formData).length === 0){
-      setUserUpdateError("Nothing new to Update...");
+      setUserUpdateError("Nothing new to Update.");
       return;
     }
     // Wait untill the image is uploaded fully
     if(imageFileUploading){
-      setUserUpdateError("Please wait for image to be uploaded...");
+      setUserUpdateError("Please wait for image to be uploaded.");
       return;
     }
 
@@ -118,7 +120,7 @@ const DashProfile = () => {
       dispatch(updateStart());
 
       // get a response from the backend
-      const res = await fetch(`api/user/update/${currentUser._id}` , {
+      const res = await fetch(`api/auth/update/${currentUser._id}` , {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -136,7 +138,7 @@ const DashProfile = () => {
       // If no error then procees further
       else{
         dispatch(updateSuccess(data)); 
-        setUserUpdateSuccess("Profile updated successfully...");
+        setUserUpdateSuccess("Profile updated successfully.");
       }
     } catch (error) {
       dispatch(updateFailure(error.message));
@@ -144,13 +146,13 @@ const DashProfile = () => {
   };
 
   // Function to handle the Deletion of user
-  const handleDeleteUser = async (e) => {
+  const handleDeleteUserAccount = async (e) => {
     setShowPopup(false);
     try {
       dispatch(deleteStart());
 
       // get a response from the backend
-      const res = await fetch(`api/user/delete/${currentUser._id}` , {
+      const res = await fetch(`api/auth/delete/${currentUser._id}` , {
         method: "DELETE",
       });
 
@@ -163,6 +165,7 @@ const DashProfile = () => {
        // If no error then procees furthur
        else{
          dispatch(deleteSuccess(data));
+         toast.success("Account deleted");
        }
     } catch (error) {
       dispatch(deleteFailure(error.message));
@@ -178,10 +181,11 @@ const DashProfile = () => {
 
       const data = res.json();
       if(!res.ok){
-        console.log(data,message);
+        console.log(data.message);
       }else{
         dispatch(signOutSuccess());
       }
+      toast.success("Signout successful");
     } catch (error) {
       console.log(error.message);
     }
@@ -193,7 +197,7 @@ const DashProfile = () => {
     <div className="max-w-lg mx-auto w-full p-3">
       <h1 className="my-3 text-center font-medium text-2xl">Profile</h1>
       {/* Form having all the User details */}
-      <form className="flex flex-col gap-3" onSubmit={handleUserFormSubmit}>
+      <form className="flex flex-col gap-3" onSubmit={handleUpdateUserAccount}>
         {/* Input element to select image file */}
         <input type="file" accept="image/*" onChange={handleImageChange} ref={filePickerRef} hidden />
         {/* Display selected image or current user"s profile picture */}
@@ -257,7 +261,7 @@ const DashProfile = () => {
                 <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">Are you sure, you want to delete your account ?</h3>
               </div>
               <div className="flex flex-col justify-center items-center gap-3 sm:flex-row">
-                <Button color="failure" onClick={handleDeleteUser} >Yes, I'm sure</Button>
+                <Button color="failure" onClick={handleDeleteUserAccount} >Yes, I"m sure</Button>
                 <Button color="gray" onClick={() => setShowPopup(false)} >No, Cancel</Button>
                 
               </div>

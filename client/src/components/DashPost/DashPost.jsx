@@ -1,14 +1,17 @@
 // Importing required modules
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
+import toast from "react-hot-toast"
 
 // Importing components & icons
 import { Button, Modal, Table } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 
+
 // Creating our DashPost component
 const DashPost = () => {
+
     // States to handle Posts data
     const [userPost, setUserPost] = useState([]);
     const [showMore, setShowMore] = useState(true);
@@ -17,17 +20,24 @@ const DashPost = () => {
 
     // initializing the React hooks
     const { currentUser } = useSelector((state) => state.user);
-    // An effect to be triggered when currentUser.id changes
+
+    // An effect to be triggered when currentUser._id changes to fetch the posts
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                // Fetch the post from server
+                // Fetch the post(response) from server
                 const res = await fetch(`/api/post/getPost?userId=${currentUser._id}`);
+                
+                // Get the data from response
                 const data = await res.json();
+                
+                // if data is fetched successfully then show it
                 if (res.ok) {
                     setUserPost(data.posts);
                 }
-                if (data.length < 9) {
+
+                // displaying the "show more" btn dynamically
+                if (data.posts.length < 9) {
                     setShowMore(false);
                 }
             } catch (error) {
@@ -61,11 +71,13 @@ const DashPost = () => {
         setShowModal(false);
         try {
             const res = await fetch(`/api/post/deletePost/${postIdToDelete}/${currentUser._id}`, {method: "DELETE"});
+            
             const data = res.json();
             if(!res.ok){
                 console.log(error.message);
             }else{
                 setUserPost( (prev) => prev.filter((post) => post._id !== postIdToDelete) );
+                toast.success("Post deleted.");
             }
         } catch (error) {
             console.log(error);
@@ -136,7 +148,7 @@ const DashPost = () => {
                 <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">Are you sure, you want to delete this Post ?</h3>
               </div>
               <div className="flex flex-col justify-center items-center gap-3 sm:flex-row">
-                <Button color="failure" onClick={handleDeletePost} >Yes, I'm sure</Button>
+                <Button color="failure" onClick={handleDeletePost} >Yes, I"m sure</Button>
                 <Button color="gray" onClick={() => setShowPopup(false)} >No, Cancel</Button>
                 
               </div>
