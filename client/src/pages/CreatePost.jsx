@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 // Importing Firebase api
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
-import { app } from "../firebase";
 
 // Importing the components
 import ReactQuill from "react-quill";
@@ -113,6 +112,38 @@ const CreatePost = () => {
         }
     }
 
+    // Custom toolbar configs for quill
+    const modules = {
+        syntax: true,
+        toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ 'header': [1, 2, 3, false] }],
+            [{ 'size': ['small', false, 'large', 'huge'] }],
+            [{ 'script': 'sub' }, { 'script': 'super' }],
+            [
+                { 'color': [] },
+                {
+                    'background': [
+                        'false',
+                        '#fef08a', '#fde047', '#facc15',    // red 
+                        '#f87171', '#ef4444', '#dc2626',    // yellow
+                        '#86efac', '#4ade80', '#22c55e',    // green
+                        '#7dd3fc', '#38bdf8', '#0ea5e9',    // skyblue
+                        '#6b7280', '#4b5563', '#1f2937',    // gray
+                        '#a78bfa', '#8b5cf6', '#7c3aed',    // violet
+                    ]
+                }
+            ],
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+            [{ 'direction': 'rtl' }],
+            ['link'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+            ['clean']
+        ],
+    }
+
 
     // JSX for rendering our element
     return (
@@ -171,7 +202,7 @@ const CreatePost = () => {
                     type="button" 
                     gradientMonochrome="teal" 
                     size="sm" 
-                    className="flex-auto" 
+                    className="flex-auto flex items-center justify-center" 
                     onClick={uploadImage} 
                 >Upload Image</Button>
             </div>
@@ -199,10 +230,11 @@ const CreatePost = () => {
 
             {/* Post body input container */}
             <ReactQuill 
+                modules={modules}
                 theme="snow" 
                 placeholder="Write something here..." 
                 required 
-                className="h-72 md:mb-1 border-2 rounded-md border-gray-300 dark:border-gray-700"
+                className="md:mb-1 border-2 rounded-md border-gray-300 dark:border-gray-700"
                 onChange={ 
                     (value) => {
                         setPostPublishError(null);

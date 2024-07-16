@@ -11,11 +11,11 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Button, FileInput, Select, TextInput, Alert } from "flowbite-react";
 
-// Creating a page for Creating Posts
+// Creating a page for Updating Posts
 const UpdatePost = () => {
     // Initialize the hooks
     const navigate = useNavigate();
-    const { currentUser } = useSelector((state) => state.user);
+    const { currentUser } = useSelector((state) => state.user)
 
     // States handling the Image file uploading
     const [imageFile, setImageFile] = useState(null);
@@ -28,7 +28,6 @@ const UpdatePost = () => {
     const [formData, setFormData] = useState({});
     const [postPublishError, setPostPublishError] = useState(null);
     const { postId } = useParams();
-
 
     // Effect to be triggered when the Post ID changes
     useEffect(() => {
@@ -53,8 +52,7 @@ const UpdatePost = () => {
         }
     }, [postId]);
 
-
-    // Fucntion handling the uploading of image
+    // Function handling the uploading of image
     const uploadImage = async () => {
         try {
             // Stop if there is no image to upload
@@ -63,14 +61,14 @@ const UpdatePost = () => {
                 return;
             }
 
-            // .If the image exists
+            // If the image exists
             setImageFileUploadingError(null);
             const storage = getStorage();
             const imgFileName = formData.title + "-" + new Date().getTime() + "-" + imageFile.name;
             const storageRef = ref(storage, imgFileName);
             const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
-            // start the upload to firebase storage
+            // Start the upload to Firebase storage
             uploadTask.on(
                 "state_changed",
                 (snapshot) => {
@@ -79,7 +77,7 @@ const UpdatePost = () => {
                     setImageFileUploading(progress.toFixed(0));
                 },
                 (error) => {
-                    // throw the error(if any)
+                    // Throw the error (if any)
                     setImageFileUploadingError("Update Failed (Image must be less than 2 MB) or (it must be of type Image)...");
                     setImageFileUploading(null);
                     setImageFile(null);
@@ -91,8 +89,8 @@ const UpdatePost = () => {
                         setImageFileUrl(downloadURL);
                         setImageFileUploading(null);
                         setImageFileUploadingError(null);
-                        setImageFileUploadingSuccess("Image Updated Successful.")
-                        setFormData({ ...formData, image: downloadURL });
+                        setImageFileUploadingSuccess("Image Updated Successfully.");
+                        setFormData((prevData) => ({ ...prevData, image: downloadURL }));
 
                         // Clear success message after 2 seconds
                         setTimeout(() => {
@@ -104,14 +102,14 @@ const UpdatePost = () => {
         } catch (error) {
             console.log(error);
         }
-    }
+    };
 
-    // Funciton to handle the Publishing of Post formData
+    // Function to handle the Publishing of Post formData
     const handlePostPublish = async (e) => {
         e.preventDefault();
 
         try {
-            // Mget the response from server by making a request
+            // Get the response from server by making a request
             const res = await fetch(`/api/post/updatePost/${formData._id}/${currentUser._id}`, {
                 method: "PUT",
                 headers: {
@@ -120,7 +118,7 @@ const UpdatePost = () => {
                 body: JSON.stringify(formData)
             });
 
-            // convert the data into JSON
+            // Convert the data into JSON
             const data = await res.json();
 
             // If the response is not okay then stop publishing
@@ -132,13 +130,45 @@ const UpdatePost = () => {
             else if (res.ok) {
                 setPostPublishError(null);
                 navigate(`/post/${data.slug}`);
+                setFormData({});
             }
         } catch (error) {
             console.log(error);
             setPostPublishError("Something went wrong...");
         }
-    }
+    };
 
+    // Custom toolbar configs for quill
+    const modules = {
+        syntax: true,
+        toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ 'header': [1, 2, 3, false] }],
+            [{ 'size': ['small', false, 'large', 'huge'] }],
+            [{ 'script': 'sub' }, { 'script': 'super' }],
+            [
+                { 'color': [] },
+                {
+                    'background': [
+                        'false',
+                        '#fef08a', '#fde047', '#facc15',    // red 
+                        '#f87171', '#ef4444', '#dc2626',    // yellow
+                        '#86efac', '#4ade80', '#22c55e',    // green
+                        '#7dd3fc', '#38bdf8', '#0ea5e9',    // skyblue
+                        '#6b7280', '#4b5563', '#1f2937',    // gray
+                        '#a78bfa', '#8b5cf6', '#7c3aed',    // violet
+                    ]
+                }
+            ],
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+            [{ 'direction': 'rtl' }],
+            ['link'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+            ['clean']
+        ],
+    }
 
     // JSX for rendering our element
     return (
@@ -146,7 +176,7 @@ const UpdatePost = () => {
             {/* Title of the page */}
             <h1 className="text-center text-2xl my-5 font-semibold">Update a Post</h1>
             {/* Form to fill content of the post */}
-            <form action="" className="flex flex-col gap-4" onSubmit={handlePostPublish} >
+            <form action="" className="flex flex-col gap-4" onSubmit={handlePostPublish}>
                 {/* Post title and Category container */}
                 <div className="flex flex-col gap-4 sm:flex-row justify-between">
                     <TextInput
@@ -155,22 +185,18 @@ const UpdatePost = () => {
                         required
                         id="title"
                         className="flex-1"
-                        onChange={
-                            (e) => {
-                                setPostPublishError(null);
-                                setFormData({ ...formData, title: e.target.value })
-                            }
-                        }
-                        value={formData.title}
+                        onChange={(e) => {
+                            setPostPublishError(null);
+                            setFormData((prevData) => ({ ...prevData, title: e.target.value }));
+                        }}
+                        value={formData.title || ""}
                     />
                     <Select
-                        onChange={
-                            (e) => {
-                                setPostPublishError(null);
-                                setFormData({ ...formData, category: e.target.value })
-                            }
-                        }
-                        value={formData.category}
+                        onChange={(e) => {
+                            setPostPublishError(null);
+                            setFormData((prevData) => ({ ...prevData, category: e.target.value }));
+                        }}
+                        value={formData.category || "uncategorized"}
                     >
                         <option value="uncategorized">Select a Category</option>
                         <option value="html">HTML</option>
@@ -188,68 +214,53 @@ const UpdatePost = () => {
                         type="file"
                         accept="image/*"
                         className="flex-auto"
-                        onChange={
-                            (e) => {
-                                setPostPublishError(null);
-                                setImageFile(e.target.files[0])
-                            }
-                        }
+                        onChange={(e) => {
+                            setPostPublishError(null);
+                            setImageFile(e.target.files[0]);
+                        }}
                     />
                     <Button
                         type="button"
                         gradientMonochrome="teal"
                         size="sm"
-                        className="flex-auto"
+                        className="flex-auto flex items-center justify-center"
                         onClick={uploadImage}
-                    >Update Image</Button>
+                    >
+                        Update Image
+                    </Button>
                 </div>
 
                 {/* Progress bar to show image upload progress */}
-                {imageFileUploading !== null && (
-                    <progress value={imageFileUploading} max="100" />
-                )}
+                {imageFileUploading !== null && <progress value={imageFileUploading} max="100" />}
                 {/* Alert to display image upload error */}
-                {imageFileUploadingError !== null && (
-                    <Alert color="failure">
-                        {imageFileUploadingError}
-                    </Alert>
-                )}
-                {/* Alert to display image upload succes */}
-                {imageFileUploadingSuccess !== null && (
-                    <Alert color="success">
-                        {imageFileUploadingSuccess}
-                    </Alert>
-                )}
+                {imageFileUploadingError !== null && <Alert color="failure">{imageFileUploadingError}</Alert>}
+                {/* Alert to display image upload success */}
+                {imageFileUploadingSuccess !== null && <Alert color="success">{imageFileUploadingSuccess}</Alert>}
                 {/* Display the uploaded image */}
-                {formData.image && (
-                    <img src={formData.image} alt="img" className="w-full h-72 object-cover" />
-                )}
+                {formData.image && <img src={formData.image} alt="img" className="w-full h-72 object-cover" />}
 
                 {/* Post body input container */}
                 <ReactQuill
+                    modules={modules}
                     theme="snow"
                     placeholder="Write something here..."
                     required
-                    className="h-72 md:mb-1 border-2 rounded-md border-gray-300 dark:border-gray-700"
-                    onChange={
-                        (value) => {
-                            setPostPublishError(null);
-                            setFormData({ ...formData, content: value })
-                        }
-                    }
-                    value={formData.content}
+                    className="md:mb-1 overflow-auto border-2 rounded-md border-gray-300 dark:border-gray-700"
+                    onChange={(value) => {
+                        setPostPublishError(null);
+                        setFormData((prevData) => ({ ...prevData, content: value }));
+                    }}
+                    value={formData.content || ""}
                 />
-                <Button type="submit" gradientMonochrome="teal" size="sm" className="mb-5">Update Post</Button>
+                <Button type="submit" gradientMonochrome="teal" size="sm" className="mb-5">
+                    Update Post
+                </Button>
             </form>
             {/* Alert to display post publish error */}
-            {postPublishError !== null && (
-                <Alert color="failure">
-                    {postPublishError}
-                </Alert>
-            )}
+            {postPublishError !== null && <Alert color="failure">{postPublishError}</Alert>}
         </div>
     );
 };
 
-// Exporting our Create Posts page
+// Exporting our Update Posts page
 export default UpdatePost;

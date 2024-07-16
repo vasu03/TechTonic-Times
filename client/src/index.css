@@ -15,9 +15,7 @@
     font-family: "Poppins", sans-serif;
 }
 
-body{
-    height: 100vh;
-}
+body{ height: 100vh; }
 
 /* Global Scrollbar Styling */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -48,6 +46,117 @@ progress::-webkit-progress-value {
     border: 2px solid #f9fafb;
     border-radius: inherit;
 }
-.ql-editor{
-    font-size: 1.03rem;         /* add extra 3% to whatever it's at a instant */
+.dark.ql-toolbar{
+    background: #f2f7ff;
+    border: 2px solid #f9fafb;
+    border-radius: inherit;
+}
+
+.dark .quill .ql-toolbar{ background: #374151; }
+
+/* Styles for formatter btns in toolbar */
+.dark .quill .ql-toolbar .ql-formats button .ql-stroke { stroke: white; }
+.dark .quill .ql-toolbar .ql-formats button .ql-fill { fill: white; }
+
+
+/* style for dropdowns in toolbar */
+.dark .quill .ql-toolbar .ql-formats .ql-picker,
+.dark .quill .ql-toolbar .ql-formats .ql-picker .ql-picker-label {
+    color: white;
+    border: none;
+    outline: none;
+}
+
+.dark .quill .ql-toolbar .ql-formats .ql-picker .ql-picker-label .ql-stroke { stroke: white; }
+.dark .quill .ql-toolbar .ql-formats .ql-picker .ql-picker-options {
+    background: #374151;
+    border: 1px solid #888;
+}
+
+.dark .quill .ql-toolbar .ql-formats .ql-picker .ql-picker-options .ql-picker-item .ql-stroke{ stroke: #ddd; }
+.quill .ql-toolbar .ql-formats .ql-picker .ql-picker-options { border-radius: 10px; }
+
+
+/* Styling for the syntax of Code-Block inserted */
+.quill .ql-container .ql-editor .ql-syntax { 
+    background: #1e293b;
+    font-family: 'Cascadia Code', sans-serif;
+    font-weight: 400; 
+    border-radius: 10px; 
+}
+.dark .quill .ql-container .ql-editor .ql-syntax{
+    background: #242a35;
+    color: #d5dce5;
+}
+
+/* Styles for the Tooltip */
+.quill .ql-container .ql-tooltip.ql-editing{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 10px !important;
+    left: 20px !important;
+    right: 0 !important;
+}
+.quill .ql-container .ql-tooltip.ql-hidden{ display: none; }
+.quill .ql-container .ql-tooltip input[type="text"]{ flex: 1; }
+
+/* Styles for the quill Container */
+.quill .ql-container{ height: 30rem; }
+
+/* Styles for the text editor of quill */
+.quill .ql-container .ql-editor{
+    font-size: 1.03rem;         
+    overflow-y: scroll;
+}
+
+/* Styles for the content of the post rendered on the webpage*/
+.post-content p{ margin-bottom: .5rem; }
+
+.post-content h1{
+    font-size: 2.1rem;
+    font-weight: 700;
+    margin-block: .3rem;
+}
+
+.post-content h2{
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-block: .2rem;
+}
+
+.post-content h3{
+    font-size: 1.5rem;
+    font-weight: 550;
+    margin-block: .1rem;
+}
+
+.post-content a{
+    color: rgb(73, 149, 199);
+    text-decoration: none;
+    cursor: pointer;
+}
+.post-content a:hover{ text-decoration: underline; }
+
+.post-content ul{
+    list-style-type: disc; 
+    margin-left: 1.2rem;
+}
+.post-content ol{
+    list-style-type: decimal;
+    margin-left: 1.2rem;
+}
+
+.post-content .ql-syntax{
+    background: #1e293b;
+    font-family: 'Cascadia Code', sans-serif;
+    font-weight: 400;
+    color: #e2e8f0; 
+    border-radius: 10px;
+    padding: .8rem;
+}
+.dark .post-content .ql-syntax{
+    background: #242a35;
+    color: #d5dce5;
+    overflow-x: auto;
 }
