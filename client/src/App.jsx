@@ -18,20 +18,21 @@ import Header from "./components/Header/Header";
 import FooterSection from './components/Footer/Footer';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AdminPrivateRoute from "./components/AdminPrivateRoute/AdminPrivateRoute";
+import ViewPost from './pages/ViewPost';
 
 // Creating our App
 const App = () => {
   return (
     // Define a BrowserRouter to be able to route through diff endpoints
     <BrowserRouter>
-      <Header />                                {/* placed under BrowserRouter.. so, that is shown on all pages */}      
+      <Header />                                        {/* placed under BrowserRouter.. so, that is shown on all pages */}      
       {/* Define the Routes of diff pages */}
       <Routes>
         <Route path='/' element={<Home/>} />
         <Route path='/about' element={<About/>} />
         <Route path='/signIn' element={<SignIn/>} />
         <Route path='/signUp' element={<SignUp/>} />
-        <Route element={<PrivateRoute/>}>          {/* make the dashboard private  */} 
+        <Route element={<PrivateRoute/>}>               {/* make the dashboard private  */} 
           <Route path='/dashboard' element={<Dashboard/>} />
         </Route>
         <Route element={<AdminPrivateRoute/>}>          {/* make the create & update post page private  */}
@@ -39,6 +40,7 @@ const App = () => {
           <Route path='/updatePost/:postId' element={<UpdatePost/>} />
         </Route>
         <Route path='/projects' element={<Projects/>} />
+        <Route path='/post/:postSlug' element={<ViewPost/>} />
       </Routes>
       <FooterSection />                                {/* placed under BrowserRouter.. so, that is shown on all pages */}
       <Toaster /> 
