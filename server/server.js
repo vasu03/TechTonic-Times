@@ -7,6 +7,8 @@ const { dbConnect } = require("./database/dbConnection");
 const userRoute = require("./routes/userRoute");
 const authRoute = require("./routes/authRoute");
 const postRoute = require("./routes/postRoute");
+const commentRoute = require("./routes/commentRoute");
+
 
 // Configuring the env file
 const dotenv = require("dotenv");
@@ -15,18 +17,21 @@ dotenv.config();
 // Creating our Express App
 const app = express();
 
+
 // Setting up the middlewares
-app.use(express.json());
+app.use(express.json());                                // Middleware to parse the JSON data
 app.use(express.urlencoded({ extended: true }));        // Middleware to parse URL-encoded bodies
 app.use(cookieParser());                                // Middleware to parse the cookies
+
 
 // Setting up the routes
 app.use("/api/user", userRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/post", postRoute);
+app.use("/api/post", commentRoute);
+
 
 // Starting the Express App server
-
 const PORT = process.env.PORT || 5000;
 dbConnect().then(() => {
     console.log("Server Connected to DB...");
@@ -34,6 +39,7 @@ dbConnect().then(() => {
         console.log(`Server up & running at http://localhost:${PORT}`);
     })
 });
+
 
 // Express Global Error Handler
 app.use((err, req, res, next) => {

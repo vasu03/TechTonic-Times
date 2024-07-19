@@ -5,6 +5,7 @@ import moment from "moment";
 
 // Importing ui components
 import { Spinner } from "flowbite-react";
+import PostCommentSection from "../components/PostCommentSection/PostCommentSection";
 
 
 // Creating the View Post page
@@ -99,6 +100,9 @@ const ViewPost = () => {
                         <div
                             dangerouslySetInnerHTML={{ __html: post && post.content }}
                             className="w-full mx-auto post-content"></div>
+
+                        {/* Post comment box */}
+                        <PostCommentSection postId={post && post._id} />
                     </main>
                 )}
 
