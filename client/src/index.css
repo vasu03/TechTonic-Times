@@ -149,14 +149,57 @@ progress::-webkit-progress-value {
 
 .post-content .ql-syntax{
     background: #1e293b;
-    font-family: 'Cascadia Code', sans-serif;
     font-weight: 400;
     color: #e2e8f0; 
     border-radius: 10px;
     padding: .8rem;
+    overflow-x: auto;
 }
+
+.post-content .ql-syntax span{ font-family: 'Cascadia Code', sans-serif !important; }
+
 .dark .post-content .ql-syntax{
     background: #242a35;
     color: #d5dce5;
-    overflow-x: auto;
+}
+
+
+/* = = = =  MEDIA QUERIES = = = = =  */
+@media (max-width: 1280px){
+    
+}
+
+
+@media (max-width: 1024px){
+
+}
+
+
+@media (max-width: 768px){
+
+}
+
+
+@media (max-width: 500px){
+    .post-content h1{
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    .post-content h2{
+        font-size: 1.3rem;
+        font-weight: 550;
+    }
+    .post-content h3{
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+    .post-content p, 
+    .post-content a,
+    .post-content ul,
+    .post-content ol, 
+    .post-content .ql-syntax{
+        font-size: .9rem;
+        font-weight: 300;
+        letter-spacing: .05rem;
+    }
 }
