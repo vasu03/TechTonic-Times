@@ -78,3 +78,25 @@ exports.deleteUser = async (req, res, next) => {
 		next(error);
 	}
 };
+
+
+// Controller to get all the users who commented on any post
+exports.getCommentUsers = async (req, res, next) => {
+	try {
+		// Get the users based on their id
+		const usersCommented = await User.findById(req.params.userId);
+
+		// If there is no users then return a error.
+		if (!usersCommented){
+			return next(404, "No user found.");
+		}
+
+		// Separate sensitive credentials from returning data
+		const { password, isAdmin, email, ...rest } = usersCommented._doc;
+
+		// return the obtained data
+		res.status(200).json(rest);
+	} catch (error) {
+		next(error);
+	}
+}

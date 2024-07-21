@@ -11,7 +11,7 @@ const { getComment, addNewComment, updateComment, deleteComment } = require('../
 const router = express.Router();
 
 // Defining the routes
-router.get("/getComment", verifyUser, getComment);
+router.get("/getComment/:postId", getComment);
 router.post("/addComment", verifyUser, addNewComment);
 router.put("/editComment", verifyUser, updateComment);
 router.delete("/deleteComment", verifyUser, deleteComment);

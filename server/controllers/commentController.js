@@ -48,7 +48,11 @@ exports.updateComment = async (req, res, next) => {
 // Controller function to Get a comment
 exports.getComment = async (req, res, next) => {
     try {
-        
+        // Get all the comments for a particular post
+        const comments = await Comment.find({ postId: req.params.postId }).sort({ createdAt: -1 });
+
+        // return the obtained data
+        res.status(200).json(comments);
     } catch (error) {
         next(error);
     }
