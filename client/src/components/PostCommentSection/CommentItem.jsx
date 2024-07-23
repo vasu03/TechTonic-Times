@@ -1,22 +1,23 @@
 // Imporitng the component
 import React, { useEffect, useState } from "react";
 import moment from "moment";
+import { useSelector } from "react-redux";
 
 // Importing icons
 // Importing the Icons
 import { HiOutlineHeart, HiHeart } from "react-icons/hi";
 
 // Creating the CommentItem component
-const CommentItem = ({ comment }) => {
-    // destructuring the incoming data
-    const { postId, userId, content, likes, numberOfLike, createdAt } = comment;
+const CommentItem = ({ comment, handleCommentLikes }) => {
+    // Retrieve current user information from Redux store global state
+    const { currentUser } = useSelector((state) => state.user);
 
     // Some states to handle the comments & user data
     const [user, setUser] = useState([]);
     const [getUserError, setGetUserError] = useState(null);
 
     // Variables to handle the comments data
-    const commentCreatedAt = moment(createdAt).fromNow();
+    const commentCreatedAt = moment(comment.createdAt).fromNow();
 
     // Effect to fetch the user data for every comment
     useEffect(() => {
@@ -24,7 +25,7 @@ const CommentItem = ({ comment }) => {
             // function to fetch the user data
             const fetchUser = async () => {
                 // get the response from server
-                const res = await fetch(`/api/user/getCommentUser/${userId}`, {
+                const res = await fetch(`/api/user/getCommentUser/${comment.userId}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -68,8 +69,23 @@ const CommentItem = ({ comment }) => {
                         </span>
                     </div>
                     <div className="w-max flex flex-col-reverse items-center justify-center gap-1 text-[10px] dark:text-gray-400 text-gray-500 ">
-                        {numberOfLike}
-                        <HiOutlineHeart className="text-lg cursor-pointer" />
+                        {comment.numberOfLike}
+                        <button
+                            type="button"
+                            className="bg-transparent flex items-center justify-center"
+                            onClick={() => handleCommentLikes(comment._id)}
+                        >
+                            <HiOutlineHeart
+                                className={`
+                                    text-lg 
+                                    cursor-pointer
+                                    ${currentUser && Array.isArray(comment.likes) &&
+                                    comment.likes.includes(currentUser._id) &&
+                                    "stroke-red-500 fill-red-500"
+                                    }
+                                `}
+                            />
+                        </button>
                     </div>
                 </div>
 

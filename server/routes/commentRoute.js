@@ -5,7 +5,7 @@ const express = require('express');
 
 // Importing our Custom middlewares
 const { verifyUser } = require('../middlewares/verifyUser');
-const { getComment, addNewComment, updateComment, deleteComment } = require('../controllers/commentController');
+const { getComment, addNewComment, updateComment, likeComment, deleteComment } = require('../controllers/commentController');
 
 // Creating a router
 const router = express.Router();
@@ -13,7 +13,8 @@ const router = express.Router();
 // Defining the routes
 router.get("/getComment/:postId", getComment);
 router.post("/addComment", verifyUser, addNewComment);
-router.put("/editComment", verifyUser, updateComment);
+router.put("/editComment/:commentId", verifyUser, updateComment);
+router.put("/likeComment/:commentId", verifyUser, likeComment);
 router.delete("/deleteComment", verifyUser, deleteComment);
 
 // Exporting the router

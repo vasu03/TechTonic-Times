@@ -1,7 +1,7 @@
 // Importing the required modules
 import React, { memo, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 // Importing the ui components
@@ -13,6 +13,9 @@ import CommentItem from "./CommentItem";
 
 // Creating the Post Comment Section component
 const PostCommentSection = ({ postId }) => {
+    // Hooks to handle the comment data
+    const navigateTo = useNavigate();
+
     // Retrieve current user information from Redux store global state
     const { currentUser } = useSelector((state) => state.user);
 
@@ -56,7 +59,43 @@ const PostCommentSection = ({ postId }) => {
         }
     }
 
+    // function to handle the like/unlike over a comment
+    const handleCommentLikes = async (commentId) => {
+        try {
+            if (!currentUser) {
+                navigateTo("/signIn");
+                return;
+            }
+            // get the response from server
+            const res = await fetch(`/api/post/likeComment/${commentId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+
+            // convert the obtained data
+            const data = await res.json();
+
+            // update the comments if its ok
+            if (res.ok) {
+                setGetComments(getComments.map(
+                    (comment) => comment._id === commentId ? {
+                        ...comment,
+                        likes: data.likes,
+                        numberOfLike: data.likes.length
+                    } : comment
+                ))
+            }
+
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
     // function to handle editting of comment
+
+
 
 
     // Effect to handle the fetching of comments whenever post changes
@@ -81,11 +120,8 @@ const PostCommentSection = ({ postId }) => {
                     setGetComments(data);
                 }
             }
-
             // call the function for execution
             fetchComments();
-
-
         } catch (error) {
             console.log(error.message);
         }
@@ -137,8 +173,6 @@ const PostCommentSection = ({ postId }) => {
                 </form>
             )}
 
-
-
             {/* Showing all the comments for a post */}
             {getComments.length > 0 ?
                 // Show all the comments
@@ -152,9 +186,15 @@ const PostCommentSection = ({ postId }) => {
 
                         {/* Show the actual comments */}
                         <div className="px-1 flex flex-col items-center sm:px-3 h-[30rem] overflow-auto">
-                            {getComments.map((comment) => (
-                                <CommentItem key={comment._id} comment={comment} />
-                            ))}
+                            {
+                                getComments && (
+                                    getComments.map((comment) => (
+                                        <CommentItem
+                                            key={comment && comment._id}
+                                            comment={comment}
+                                            handleCommentLikes={handleCommentLikes} />
+                                    ))
+                                )}
                         </div>
                     </div>
                 ) :
