@@ -4,8 +4,9 @@ import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-// Importing the ui components
-import { Alert, Button, Textarea } from "flowbite-react";
+// Importing the ui components & icons
+import { Alert, Button, Modal, Textarea } from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 // Importing custom components
 import CommentItem from "./CommentItem";
@@ -24,6 +25,8 @@ const PostCommentSection = ({ postId }) => {
     const [commentToAddError, setCommentToAddError] = useState(null);
     const [getComments, setGetComments] = useState([]);
     const [getCommentError, setGetCommentError] = useState(null);
+    const [commentIdToDelete, setCommentIdToDelete] = useState(null);
+    const [showPopup, setShowPopup] = useState(false);
 
     // function to handle the adding of new comments to a post
     const handleAddComment = async (e) => {
@@ -93,11 +96,6 @@ const PostCommentSection = ({ postId }) => {
         }
     }
 
-    // function to handle editting of comment
-
-
-
-
     // Effect to handle the fetching of comments whenever post changes
     useEffect(() => {
         try {
@@ -126,6 +124,53 @@ const PostCommentSection = ({ postId }) => {
             console.log(error.message);
         }
     }, [postId]);
+
+    // funciton to handle comment data after editting, so all comments can get reftched
+    const handleCommentEdit = (commentId, editedCommentContent) => {
+        setGetComments((prevComments) =>
+            prevComments.map((comment) =>
+                comment._id === commentId ? { ...comment, content: editedCommentContent } : comment
+            )
+        );
+    };
+
+    // function to handle the Deleting of the comment
+    const handleCommentDelete = async (commentId) => {
+        try {
+            if (!currentUser) {
+                navigateTo("/signIn");
+                return;
+            }
+            // get the response from server
+            const res = await fetch(`/api/post/deleteComment/${commentId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+
+            // convert the obtained data
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.error("Can't delete comment. Please try again later.");
+            } else {
+                // filter the comments we are fetching after deletion
+                getComments.map((comment) => {
+                    if (comment._id === commentId) {
+                        setGetComments(
+                            getComments.filter((comment) => comment._id !== commentId)
+                        )
+                    }
+                });
+                toast.success("Comment deleted.")
+            }
+            setShowPopup(false);
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
 
 
     //   JSX to render the component
@@ -192,7 +237,12 @@ const PostCommentSection = ({ postId }) => {
                                         <CommentItem
                                             key={comment && comment._id}
                                             comment={comment}
-                                            handleCommentLikes={handleCommentLikes} />
+                                            handleCommentLikes={handleCommentLikes}
+                                            handleCommentEdit={handleCommentEdit}
+                                            handleCommentDelete={(commentId) => {
+                                                setShowPopup(true);
+                                                setCommentIdToDelete(commentId);
+                                            }} />
                                     ))
                                 )}
                         </div>
@@ -205,6 +255,24 @@ const PostCommentSection = ({ postId }) => {
                         <p>Be the first one to comment on this post !!</p>
                     </div>
                 )}
+
+            {/* A popup for confirmation while deleting a comment */}
+            {showPopup && (
+                <Modal show={showPopup} onClose={() => setShowPopup(false)} popup size="md">
+                    <Modal.Header />
+                    <Modal.Body>
+                        <div className="text-center">
+                            <HiOutlineExclamationCircle className="w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+                            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">Are you sure, you want to delete this comment ?</h3>
+                        </div>
+                        <div className="flex flex-col justify-center items-center gap-3 sm:flex-row">
+                            <Button color="failure" onClick={() => handleCommentDelete(commentIdToDelete)} >Yes, I"m sure</Button>
+                            <Button color="gray" onClick={() => setShowPopup(false)} >No, Cancel</Button>
+
+                        </div>
+                    </Modal.Body>
+                </Modal>
+            )}
         </div>
     );
 };
