@@ -5,7 +5,10 @@ import moment from "moment";
 
 // Importing ui components
 import { Spinner } from "flowbite-react";
+
+// Importing custom components
 import PostCommentSection from "../components/PostCommentSection/PostCommentSection";
+import ArticleCard from "../components/RecentArticles/ArticleCard";
 
 
 // Creating the View Post page
@@ -17,6 +20,7 @@ const ViewPost = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchError, setIsFetchError] = useState(false);
     const [post, setPost] = useState(null);
+    const [recentArticles, setRecentArticles] = useState(null);
 
     // variables to handle fetching post data
     const createdAt = moment(post && post.createdAt).fromNow();
@@ -57,6 +61,41 @@ const ViewPost = () => {
         // Calling the function for fetching
         fetchPost();
     }, [postSlug]);
+
+    // An effect to trigger the fetching of recently published articles
+    useEffect(() => {
+        // function to fetch data
+        const fetchRecentArticles = async () => {
+            try {
+                setIsLoading(true);
+                // get the response from the server
+                const res = await fetch(`/api/post/getPost?limit=3`, {
+                    method: "GET"
+                });
+
+                // convert the obtained data
+                const data = await res.json();
+
+                // the data is not fetched then set errors
+                if (!res.ok) {
+                    setIsFetchError(true);
+                    setIsLoading(false);
+                    return;
+                } else {
+                    // grab the first element from obtained array
+                    setRecentArticles(data.posts);
+                    setIsLoading(false);
+                    setIsFetchError(false);
+                }
+            } catch (error) {
+                setIsLoading(true);
+                setIsFetchError(true);
+                console.log(error);
+            }
+        }
+        // Calling the function for fetching
+        fetchRecentArticles();
+    }, []);
     
 
     // JSX to render the page
@@ -103,9 +142,21 @@ const ViewPost = () => {
 
                         {/* Post comment box */}
                         <PostCommentSection postId={post && post._id} />
+
+                        {/* Recent Articles section */}
+                        <div className="flex flex-col items-center justify-center gap-4 py-4 sm:p-4 mb-4 border-t border-slate-400 dark:border-slate-700 w-full">
+                            <h1 className="text-xl sm:text-2xl font-light text-gray-500 dark:text-gray-300">Recent articles</h1>
+                            <div className="flex flex-col sm:flex-row items-start justify-center gap-4">
+                                {recentArticles && (
+                                        recentArticles.map((article) => (
+                                            <ArticleCard key={article._id} article={article} />
+                                        ))
+                                    )
+                                }
+                            </div>
+                        </div>
                     </main>
                 )}
-
         </>
     );
 };
