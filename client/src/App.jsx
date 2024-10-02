@@ -15,7 +15,7 @@ import UpdatePost from './pages/UpdatePost';
 import ViewPost from './pages/ViewPost';
 
 // Importing our custom components
-import ScrollToTop from './components/ScrollToTop/ScrollToTop';
+// import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import Header from "./components/Header/Header";
 import FooterSection from './components/Footer/Footer';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
@@ -26,7 +26,7 @@ const App = () => {
   return (
     // Define a BrowserRouter to be able to route through diff endpoints
     <BrowserRouter>
-      <ScrollToTop />
+      {/*<ScrollToTop />*/}
       <Header />                                        {/* placed under BrowserRouter.. so, that is shown on all pages */}      
       {/* Define the Routes of diff pages */}
       <Routes>

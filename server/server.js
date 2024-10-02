@@ -20,7 +20,7 @@ const app = express();
 
 // Setting up the middlewares
 app.use(express.json());                                // Middleware to parse the JSON data
-app.use(express.urlencoded({ extended: true }));        // Middleware to parse URL-encoded bodies
+app.use(express.urlencoded({ extended: false }));        // Middleware to parse URL-encoded bodies
 app.use(cookieParser());                                // Middleware to parse the cookies
 
 
