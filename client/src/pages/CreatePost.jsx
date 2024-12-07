@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 
 // Importing the components
-import ReactQuill from "react-quill";
+// import ReactQuill from "react-quill";
+import ReactQuill, { Quill } from 'react-quill';
 import "react-quill/dist/quill.snow.css";
 import { Button, FileInput, Select, TextInput, Alert } from "flowbite-react";
 
