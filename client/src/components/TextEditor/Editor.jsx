@@ -1,5 +1,4 @@
-// Importing the required module
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { $generateHtmlFromNodes } from '@lexical/html';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
@@ -11,88 +10,76 @@ import { HeadingNode } from '@lexical/rich-text';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import DOMPurify from 'dompurify';
 
-// Importing the custom components
+// Importing custom componenets
 import Toolbar from './Toolbar.jsx';
 
-// Error handler for Lexical editor
-const onError = (error) => {
-	console.error('Lexical Error:', error);
+const sanitizeContent = (htmlContent) => {
+	return DOMPurify.sanitize(htmlContent, {
+		ALLOWED_TAGS: ['img', 'p', 'div', 'span', 'b', 'i', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'a'],
+		ALLOWED_ATTR: ['src', 'alt', 'href', 'title', 'class', 'style'],
+	});
 };
 
-// Component to update editor content in real-time
-const EditorContentUpdater = ({ setContent }) => {
-	// hook to get the context to lexical editor 
+const EditorContentUpdater = React.memo(({ setContent }) => {
 	const [editor] = useLexicalComposerContext();
 
 	useEffect(() => {
 		const updateContent = () => {
 			let htmlContent = '';
-			// Read the current editor state and generate HTML
 			editor.getEditorState().read(() => {
 				htmlContent = $generateHtmlFromNodes(editor);
 			});
-			// Sanitize the generated HTML content
-			const sanitizedContent = DOMPurify.sanitize(htmlContent, {
-				ALLOWED_TAGS: ['img', 'p', 'div', 'span', 'b', 'i', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'a'],
-				ALLOWED_ATTR: ['src', 'alt', 'href', 'title', 'class', 'style'],
-			});
-			setContent(htmlContent);
+			const sanitizedContent = sanitizeContent(htmlContent);
+			setContent(sanitizedContent);
 		};
 
-		// Register a listener to update content on editor state change
 		const unregister = editor.registerUpdateListener(() => {
 			updateContent();
 		});
 
-		// Cleanup function to unregister the listener
 		return () => {
 			unregister();
 		};
 	}, [editor, setContent]);
 
-	// This component does not render any UI
 	return null;
-};
+});
 
-// Main Editor component
 const Editor = ({ onSave }) => {
-	// State to hold the current editor content
 	const [content, setContent] = useState('');
 
-	// Configuration for the Lexical editor
-	const initialConfig = {
-		namespace: 'MyEditor', 	// Unique identifier for this editor
-		theme: editorTheme, 	// Theme object for styling the editor
-		nodes: [HeadingNode], 	// Register custom nodes 
-		onError, // Error handler
-	};
+	const initialConfig = useMemo(
+		() => ({
+			namespace: 'MyEditor',
+			theme: editorTheme,
+			nodes: [HeadingNode],
+			onError: (error) => console.error('Lexical Error:', error),
+		}),
+		[]
+	);
 
-	// Effect to handle content save logic when it changes
-	useEffect(() => {
+	const handleSave = useCallback(() => {
 		if (onSave) {
-			// Invoke the save callback with updated content
 			onSave(content);
 		}
 	}, [content, onSave]);
 
+	useEffect(() => {
+		handleSave();
+	}, [content, handleSave]);
+
 	return (
 		<div className="w-full mx-auto bg-slate-50 dark:bg-slate-800 rounded-lg h-[80vh] p-5 flex flex-col items-center gap-2">
-			{/* LexicalComposer is the parent container for the editor */}
 			<LexicalComposer initialConfig={initialConfig}>
-				{/* Toolbar component for additional editor actions */}
 				<Toolbar />
-				{/* RichTextPlugin provides rich text editing capabilities */}
 				<RichTextPlugin
 					contentEditable={
 						<ContentEditable className="focus:outline-none rounded-lg h-full w-full p-3 bg-white dark:bg-[#334155aa] dark:text-white" />
 					}
-					ErrorBoundary={LexicalErrorBoundary} // Handles rendering errors in the editor
+					ErrorBoundary={LexicalErrorBoundary}
 				/>
-				{/* Adds undo/redo functionality */}
 				<HistoryPlugin />
-				{/* Automatically focuses on the editor when it mounts */}
 				<AutoFocusPlugin />
-				{/* Updates content in real-time */}
 				<EditorContentUpdater setContent={setContent} />
 			</LexicalComposer>
 		</div>
@@ -166,7 +153,7 @@ const editorTheme = {
 		tag: 'editor-tokenProperty',
 		url: 'editor-tokenOperator',
 		variable: 'editor-tokenVariable',
-	}
+	},
 };
 
-export default Editor;
+export default React.memo(Editor);
