@@ -56,7 +56,7 @@ const ViewPost = () => {
                 setIsFetchError(true);
                 console.log(error);
             }
-            
+
         }
         // Calling the function for fetching
         fetchPost();
@@ -69,7 +69,7 @@ const ViewPost = () => {
             try {
                 setIsLoading(true);
                 // get the response from the server
-                const res = await fetch(`/api/post/getPost?limit=3`, {
+                const res = await fetch(`/api/post/getPost?limit=4`, {
                     method: "GET"
                 });
 
@@ -96,7 +96,7 @@ const ViewPost = () => {
         // Calling the function for fetching
         fetchRecentArticles();
     }, []);
-    
+
 
     // JSX to render the page
     return (
@@ -110,7 +110,7 @@ const ViewPost = () => {
                 ) :
                 (
                     // Showing the Post when data is fetched
-                    <main className="p-3 flex flex-col items-center gap-5 sm:gap-3 max-w-6xl min-h-screen mx-auto ">
+                    <main className="p-3 flex flex-col items-center gap-5 sm:gap-3 max-w-7xl min-h-screen mx-auto ">
                         {/* Show title of Post */}
                         <h2 className="text-3xl sm:text-4xl font-bold text-center sm:p-3">
                             {post && post.title}
@@ -146,13 +146,10 @@ const ViewPost = () => {
                         {/* Recent Articles section */}
                         <div className="flex flex-col items-center justify-center gap-4 py-4 sm:p-4 mb-4 border-t border-slate-400 dark:border-slate-700 w-full">
                             <h1 className="text-xl sm:text-2xl font-light text-gray-500 dark:text-gray-300">Recent articles</h1>
-                            <div className="flex flex-col sm:flex-row items-start justify-center gap-4">
-                                {recentArticles && (
-                                        recentArticles.map((article) => (
-                                            <ArticleCard key={article._id} article={article} />
-                                        ))
-                                    )
-                                }
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                                {recentArticles && recentArticles.map((article) => (
+                                    <ArticleCard key={article._id} article={article} />
+                                ))}
                             </div>
                         </div>
                     </main>
