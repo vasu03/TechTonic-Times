@@ -43,7 +43,7 @@ const Header = () => {
 
   // JSX to render the component
   return (
-    <Navbar className="border-b-2 shadow-md">
+    <Navbar className="sticky top-0 shadow-lg shadow-gray-300 dark:shadow-slate-800 z-[10000]">
       <Link to="/" className="self-center whitespace-nowrap text-lg sm:text-3xl font-bold" >
         {/* Logo */}
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-600">
