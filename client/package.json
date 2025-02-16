@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cloudinary/react": "^1.13.1",
+    "@cloudinary/url-gen": "^1.21.0",
     "@lexical/react": "^0.21.0",
     "@lexical/rich-text": "^0.21.0",
     "@lexical/selection": "^0.21.0",

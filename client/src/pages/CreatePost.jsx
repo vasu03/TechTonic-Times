@@ -1,29 +1,22 @@
-// Importing required modules 
-import React, { useState } from "react"; 
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
-
-// Importing UI components from Flowbite
-import { Button, FileInput, Select, TextInput, Alert } from "flowbite-react"; 
-
-// Importing custom components
-import Editor from "../components/TextEditor/Editor"; 
+import { Button, FileInput, Select, TextInput, Alert } from "flowbite-react";
+import Editor from "../components/TextEditor/Editor";
+import { Cloudinary } from "@cloudinary/url-gen";
 
 const CreatePost = () => {
-    // Initialize navigate for post-publication redirect
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
-    // State variables to manage file uploads, form data, and editor content
+    // State variables
     const [imageFile, setImageFile] = useState(null);
     const [imageFileUrl, setImageFileUrl] = useState(null);
-    const [imageFileUploading, setImageFileUploading] = useState(null);
+    const [imageFileUploading, setImageFileUploading] = useState(false);
     const [imageFileUploadingError, setImageFileUploadingError] = useState(null);
     const [imageFileUploadingSuccess, setImageFileUploadingSuccess] = useState(null);
     const [postPublishError, setPostPublishError] = useState(null);
     const [formData, setFormData] = useState({});
     const [editorContent, setEditorContent] = useState("");
 
-    // Function to upload the image to Firebase Storage
     const uploadImage = async () => {
         if (!imageFile) {
             setImageFileUploadingError("Please select an Image.");
@@ -31,51 +24,50 @@ const CreatePost = () => {
         }
 
         try {
-            // Reset any previous errors
-            setImageFileUploadingError(null); 
-            // Get Firebase storage instance
-            const storage = getStorage(); 
-            // Generate a unique file name
-            const imgFileName = `${formData.title || "post"}-${Date.now()}-${imageFile.name}`; 
-            // Reference to storage location
-            const storageRef = ref(storage, imgFileName);                      
-            // Start the upload task 
-            const uploadTask = uploadBytesResumable(storageRef, imageFile);    
+            setImageFileUploadingError(null);
+            setImageFileUploading(true);
 
-            // Monitor upload progress
-            uploadTask.on(
-                "state_changed",
-                (snapshot) => {
-                    // Calculate upload progress
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100; 
-                    setImageFileUploading(progress.toFixed(0));     // Update progress in state
-                },
-                (error) => {
-                    setImageFileUploadingError("Upload failed. Ensure the file is a valid image.");
-                    setImageFileUploading(null);                    // Reset upload progress
-                },
-                async () => {
-                    // Get the download URL after successful upload
-                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref); 
-                    setImageFileUrl(downloadURL);                                   // Set the image URL in state
-                    setImageFileUploading(null);                                    // Reset upload progress
-                    setImageFileUploadingError(null);                               // Reset any errors
-                    setImageFileUploadingSuccess("Upload Successful.");             // Set success message
-                    setFormData((prev) => ({ ...prev, image: downloadURL }));       // Save image URL in formData
-                    setTimeout(() => setImageFileUploadingSuccess(null), 2000);     // Reset success message after 2 seconds
+            const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+            const cloudUploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+            const formData = new FormData();
+            formData.append("file", imageFile);
+            formData.append("upload_preset", cloudUploadPreset);
+
+
+            const response = await fetch(
+                `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+                {
+                    method: "POST",
+                    body: formData,
                 }
             );
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setImageFileUrl(data.secure_url);
+                setImageFileUploading(false);
+                setImageFileUploadingError(null);
+                setImageFileUploadingSuccess("Upload Successful.");
+                setFormData((prev) => ({ ...prev, image: data.secure_url }));
+                setTimeout(() => setImageFileUploadingSuccess(null), 2000);
+            } else {
+                setImageFileUploadingError("Upload failed. Ensure the file is a valid image.");
+                setImageFileUploading(false);
+            }
         } catch (error) {
-            console.error(error); // Log any errors
+            setImageFileUploadingError("Something went wrong.");
+            setImageFileUploading(false);
+            console.error(error);
         }
     };
 
+
     // Function to handle the post submission
     const handlePostPublish = async (e) => {
-        // Prevent default form submission
-        e.preventDefault(); 
+        e.preventDefault();
 
-        // Merge editorContent into formData before submitting the post
         const finalFormData = { ...formData, content: editorContent };
 
         try {
@@ -85,15 +77,13 @@ const CreatePost = () => {
                 body: JSON.stringify(finalFormData),
             });
 
-            // Parse the response
-            const data = await res.json();          
+            const data = await res.json();
 
             if (!res.ok) {
-                // Handle errors if post submission fails
-                setPostPublishError(data.message);  
+                setPostPublishError(data.message);
             } else {
-                setPostPublishError(null);          // Reset error if post is successfully published
-                navigate(`/post/${data.slug}`);     // Redirect to the newly created post page
+                setPostPublishError(null);
+                navigate(`/post/${data.slug}`);
             }
         } catch (error) {
             setPostPublishError("Something went wrong.");
@@ -112,12 +102,12 @@ const CreatePost = () => {
                         placeholder="Title of Post"
                         id="title"
                         className="flex-1"
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })} // Update formData on title change
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         value={formData.title}
                     />
                     {/* Category Select */}
                     <Select
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value })} // Update formData on category selection
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                         value={formData.category}
                     >
                         <option value="">Select a Category</option>
@@ -136,30 +126,30 @@ const CreatePost = () => {
                         type="file"
                         accept="image/*"
                         className="flex-auto"
-                        onChange={(e) => setImageFile(e.target.files[0])} // Update imageFile state when a file is selected
+                        onChange={(e) => setImageFile(e.target.files[0])}
                     />
                     <Button
                         type="button"
                         gradientMonochrome="teal"
                         size="sm"
                         onClick={uploadImage}
+                        disabled={imageFileUploading}
                     >
-                        Upload Image
+                        {imageFileUploading ? "Uploading..." : "Upload Image"}
                     </Button>
                 </div>
 
-                {/* Display upload progress, errors, or success message */}
-                {imageFileUploading && <progress value={imageFileUploading} max="100" />}
+                {/* Display upload errors or success message */}
                 {imageFileUploadingError && <Alert color="failure">{imageFileUploadingError}</Alert>}
                 {imageFileUploadingSuccess && <Alert color="success">{imageFileUploadingSuccess}</Alert>}
-                
+
                 {/* Display uploaded image */}
-                {formData.image && <img src={formData.image} alt="Uploaded" className="w-full h-72 object-cover" />} 
+                {formData.image && <img src={formData.image} alt="Uploaded" className="w-full h-72 object-cover" />}
 
                 {/* Text editor for the post content */}
                 <Editor
                     initialValue={editorContent}
-                    onSave={(content) => setEditorContent(content)} // Update editorContent when the editor saves content
+                    onSave={(content) => setEditorContent(content)}
                 />
 
                 {/* Submit Button */}
@@ -174,5 +164,4 @@ const CreatePost = () => {
     );
 };
 
-// Exporting the CreatePost page
-export default CreatePost; 
+export default CreatePost;

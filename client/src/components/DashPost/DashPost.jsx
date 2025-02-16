@@ -100,7 +100,7 @@ const DashPost = () => {
                         </Table.Head>
 
                         {userPost.map((post) => (
-                            <Table.Body>
+                            <Table.Body key={post._id}>
                                 <Table.Row className="dark:bg-gray-800">
                                     <Table.Cell>{new Date(post.updatedAt).toLocaleDateString()}</Table.Cell>
                                     <Table.Cell>
